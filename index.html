@@ -12,6 +12,8 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="en_GH">
   <title>Good Morning Electrical Engineering Academy | Admissions Open</title>
+  <link rel="icon" id="site-favicon" href="assets/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
@@ -27,10 +29,10 @@
   <header class="header" id="header">
     <nav class="nav container" aria-label="Main navigation">
       <a href="#hero" class="nav__logo" aria-label="Good Morning Electrical Engineering Academy — Home">
-        <span class="nav__logo-icon"><i class="fas fa-bolt" aria-hidden="true"></i></span>
+        <img src="assets/logo.png" alt="Good Morning Electrical Engineering Academy" class="site-logo nav__logo-img" width="48" height="48">
         <span class="nav__logo-text">
-          <span class="nav__logo-name">Good Morning</span>
-          <span class="nav__logo-sub">Electrical Academy</span>
+          <span class="nav__logo-name" id="nav-logo-name">Good Morning</span>
+          <span class="nav__logo-sub" id="nav-logo-sub">Electrical Academy</span>
         </span>
       </a>
 
@@ -47,6 +49,7 @@
         <li><a href="#facilities" class="nav__link">Facilities</a></li>
         <li><a href="#journey" class="nav__link">Journey</a></li>
         <li><a href="#careers" class="nav__link">Careers</a></li>
+        <li><a href="#staff" class="nav__link">Team</a></li>
         <li><a href="#admissions" class="nav__link nav__link--cta">Enroll Now</a></li>
         <li><a href="#contact" class="nav__link">Contact</a></li>
       </ul>
@@ -58,20 +61,21 @@
     <!-- Hero Section -->
     <section class="hero" id="hero" aria-labelledby="hero-heading">
       <div class="hero__bg">
-        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1920&q=80" alt="" class="hero__bg-img" loading="eager" fetchpriority="high">
+        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1920&q=80" alt="" class="hero__bg-img" id="hero-bg-img" loading="eager" fetchpriority="high">
         <div class="hero__overlay"></div>
       </div>
       <div class="hero__content container">
-        <span class="hero__badge fade-in">Admissions Open!</span>
+        <img src="assets/logo.png" alt="" class="hero__logo site-logo fade-in" width="100" height="100" aria-hidden="true">
+        <span class="hero__badge fade-in" id="hero-badge">Admissions Open!</span>
         <h1 class="hero__title fade-in" id="hero-heading">
-          Good Morning Electrical<br>Engineering Academy
+          <span id="hero-title">Good Morning Electrical<br>Engineering Academy</span>
         </h1>
-        <p class="hero__subtitle fade-in">
+        <p class="hero__subtitle fade-in" id="hero-subtitle">
           Start your journey to a successful career in the dynamic world of electrical engineering.
         </p>
         <p class="hero__tagline fade-in">
           <i class="fas fa-check-circle" aria-hidden="true"></i>
-          Practical Skills. Expert Training. Real Opportunities.
+          <span id="hero-tagline">Practical Skills. Expert Training. Real Opportunities.</span>
         </p>
         <div class="hero__actions fade-in">
           <a href="#admissions" class="btn btn--primary">
@@ -81,7 +85,7 @@
             <i class="fas fa-book-open" aria-hidden="true"></i> View Programmes
           </a>
         </div>
-        <div class="hero__stats fade-in">
+        <div class="hero__stats fade-in" id="hero-stats">
           <div class="hero__stat">
             <span class="hero__stat-number">4+</span>
             <span class="hero__stat-label">Programmes</span>
@@ -102,32 +106,34 @@
     </section>
 
     <!-- About Section -->
-    <section class="section about" id="about" aria-labelledby="about-heading">
+    <section class="section about" id="about" aria-labelledby="about-title">
       <div class="container">
         <div class="section__header reveal">
-          <span class="section__label">About Us</span>
-          <h2 class="section__title" id="about-heading">About the Academy</h2>
-          <p class="section__desc">Building Ghana's next generation of skilled electrical professionals.</p>
+          <span class="section__label" id="about-label">About Us</span>
+          <h2 class="section__title" id="about-title">About the Academy</h2>
+          <p class="section__desc" id="about-desc">Building Ghana's next generation of skilled electrical professionals.</p>
         </div>
         <div class="about__grid">
           <div class="about__image reveal">
-            <img src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80" alt="Students receiving hands-on electrical engineering training in a workshop" loading="lazy">
+            <img src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80" alt="Students receiving hands-on electrical engineering training in a workshop" id="about-img" loading="lazy">
             <div class="about__image-badge">
               <i class="fas fa-award" aria-hidden="true"></i>
-              <span>Industry-Recognized Training</span>
+              <span id="about-badge">Industry-Recognized Training</span>
             </div>
           </div>
           <div class="about__content reveal">
-            <p class="about__lead">
+            <p class="about__lead" id="about-lead">
               Good Morning Electrical Engineering Academy is a leading vocational and technical training institution in Ghana, dedicated to equipping students with the practical skills and knowledge needed to thrive in the electrical engineering industry.
             </p>
+            <div id="about-paragraphs">
             <p>
               Our academy bridges the gap between classroom theory and real-world application. We believe that the best electricians, technicians, and engineers are built through hands-on experience — working with real tools, real circuits, and real projects from day one.
             </p>
             <p>
               Whether you aspire to work in industrial settings, marine environments, or start your own electrical contracting business, our comprehensive programmes prepare you for employment and entrepreneurship in Ghana's growing electrical sector.
             </p>
-            <ul class="about__features">
+            </div>
+            <ul class="about__features" id="about-features">
               <li><i class="fas fa-check" aria-hidden="true"></i> Nationally aligned vocational curriculum</li>
               <li><i class="fas fa-check" aria-hidden="true"></i> Industry-experienced instructors</li>
               <li><i class="fas fa-check" aria-hidden="true"></i> Employment and entrepreneurship pathways</li>
@@ -147,7 +153,7 @@
           <h2 class="section__title" id="why-heading">Why Choose Us</h2>
           <p class="section__desc">What sets Good Morning Electrical Engineering Academy apart from the rest.</p>
         </div>
-        <div class="features-grid">
+        <div class="features-grid" id="features-grid">
           <article class="feature-card reveal">
             <div class="feature-card__icon">
               <i class="fas fa-tools" aria-hidden="true"></i>
@@ -188,7 +194,7 @@
           <h2 class="section__title" id="programmes-heading">Training Programmes</h2>
           <p class="section__desc">Specialized programmes designed to launch your electrical engineering career.</p>
         </div>
-        <div class="programmes-grid">
+        <div class="programmes-grid" id="programmes-grid">
 
           <article class="programme-card reveal">
             <div class="programme-card__image">
@@ -291,7 +297,7 @@
           <h2 class="section__title" id="facilities-heading">Facilities &amp; Practical Training</h2>
           <p class="section__desc">Learn in an environment built for real-world electrical engineering excellence.</p>
         </div>
-        <div class="facilities-grid">
+        <div class="facilities-grid" id="facilities-grid">
           <article class="facility-card reveal">
             <div class="facility-card__image">
               <img src="https://images.unsplash.com/photo-1581147036324-c1c89c2c8c4b?w=600&q=80" alt="Modern electrical tools and equipment" loading="lazy">
@@ -344,7 +350,7 @@
           <h2 class="section__title" id="journey-heading">Student Journey</h2>
           <p class="section__desc">From enrollment to employment — your roadmap to a rewarding electrical career.</p>
         </div>
-        <div class="timeline">
+        <div class="timeline" id="journey-timeline">
           <div class="timeline__item reveal">
             <div class="timeline__marker"><i class="fas fa-user-plus" aria-hidden="true"></i></div>
             <div class="timeline__content">
@@ -397,7 +403,7 @@
           <h2 class="section__title" id="careers-heading">Career Opportunities</h2>
           <p class="section__desc">Graduates of Good Morning Electrical Engineering Academy are prepared for diverse and rewarding careers.</p>
         </div>
-        <div class="careers-grid">
+        <div class="careers-grid" id="careers-grid">
           <article class="career-card reveal">
             <i class="fas fa-bolt" aria-hidden="true"></i>
             <h3>Electrical Technician</h3>
@@ -435,7 +441,7 @@
           <h2 class="section__title" id="testimonials-heading">What Our Students Say</h2>
           <p class="section__desc">Hear from graduates who transformed their futures through our academy.</p>
         </div>
-        <div class="testimonials-grid">
+        <div class="testimonials-grid" id="testimonials-grid">
           <blockquote class="testimonial-card reveal">
             <div class="testimonial-card__stars" aria-label="5 out of 5 stars">
               <i class="fas fa-star" aria-hidden="true"></i>
@@ -491,15 +497,39 @@
       </div>
     </section>
 
+    <!-- Our Team / Staff -->
+    <section class="section staff" id="staff" aria-labelledby="staff-heading">
+      <div class="container">
+        <div class="section__header reveal">
+          <span class="section__label">Meet the Team</span>
+          <h2 class="section__title" id="staff-heading">Our Instructors &amp; Staff</h2>
+          <p class="section__desc">Learn from experienced professionals dedicated to your success.</p>
+        </div>
+        <div class="staff-grid" id="staff-grid"></div>
+      </div>
+    </section>
+
+    <!-- Photo Gallery -->
+    <section class="section gallery" id="gallery" aria-labelledby="gallery-heading">
+      <div class="container">
+        <div class="section__header reveal">
+          <span class="section__label">Campus Life</span>
+          <h2 class="section__title" id="gallery-heading">Photo Gallery</h2>
+          <p class="section__desc">A glimpse into training, workshops, and student life at our academy.</p>
+        </div>
+        <div class="gallery-grid" id="gallery-grid"></div>
+      </div>
+    </section>
+
     <!-- Admissions CTA -->
     <section class="section admissions" id="admissions" aria-labelledby="admissions-heading">
       <div class="admissions__bg">
-        <img src="https://images.unsplash.com/photo-1454165804603-c011dffb6f88?w=1920&q=80" alt="" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1454165804603-c011dffb6f88?w=1920&q=80" alt="" id="admissions-bg-img" loading="lazy">
         <div class="admissions__overlay"></div>
       </div>
       <div class="container admissions__content reveal">
-        <h2 class="admissions__title" id="admissions-heading">Power Your Future. Enroll Today.</h2>
-        <p class="admissions__text">Admissions are now open for all programmes. Limited seats available — secure your place in Ghana's leading electrical engineering academy.</p>
+        <h2 class="admissions__title" id="admissions-title">Power Your Future. Enroll Today.</h2>
+        <p class="admissions__text" id="admissions-text">Admissions are now open for all programmes. Limited seats available — secure your place in Ghana's leading electrical engineering academy.</p>
         <div class="admissions__actions">
           <a href="#contact" class="btn btn--primary btn--lg">
             <i class="fas fa-paper-plane" aria-hidden="true"></i> Apply Now
@@ -508,7 +538,7 @@
             <i class="fas fa-phone" aria-hidden="true"></i> Call Admissions
           </a>
         </div>
-        <ul class="admissions__checklist">
+        <ul class="admissions__checklist" id="admissions-checklist">
           <li><i class="fas fa-check-circle" aria-hidden="true"></i> No prior experience required for entry-level programmes</li>
           <li><i class="fas fa-check-circle" aria-hidden="true"></i> Flexible payment plans available</li>
           <li><i class="fas fa-check-circle" aria-hidden="true"></i> Walk-in applications welcome</li>
@@ -524,7 +554,7 @@
           <h2 class="section__title" id="faq-heading">Frequently Asked Questions</h2>
           <p class="section__desc">Everything you need to know about admissions and training at our academy.</p>
         </div>
-        <div class="faq-list">
+        <div class="faq-list" id="faq-list">
           <details class="faq-item reveal">
             <summary class="faq-item__question">
               <span>What are the admission requirements?</span>
@@ -597,7 +627,7 @@
               <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
               <div>
                 <h3>Campus Address</h3>
-                <address>
+                <address id="location-address">
                   KPONE-KOMKOPE (Garages)<br>
                   Cobalt Blue Street, Lane 2<br>
                   Plot No. 4<br>
@@ -609,8 +639,8 @@
               <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
               <div>
                 <h3>GPS Address</h3>
-                <p><strong>GK-0058-7763</strong></p>
-                <a href="https://maps.google.com/?q=GK-0058-7763" class="location__gps-link" target="_blank" rel="noopener noreferrer">
+                <p><strong id="location-gps">GK-0058-7763</strong></p>
+                <a href="https://maps.google.com/?q=GK-0058-7763" class="location__gps-link" id="location-gps-link" target="_blank" rel="noopener noreferrer">
                   Open in Google Maps <i class="fas fa-external-link-alt" aria-hidden="true"></i>
                 </a>
               </div>
@@ -619,12 +649,13 @@
               <i class="fas fa-clock" aria-hidden="true"></i>
               <div>
                 <h3>Office Hours</h3>
-                <p>Monday – Friday: 8:00 AM – 5:00 PM<br>Saturday: 9:00 AM – 2:00 PM</p>
+                <p id="location-hours">Monday – Friday: 8:00 AM – 5:00 PM<br>Saturday: 9:00 AM – 2:00 PM</p>
               </div>
             </div>
           </div>
           <div class="location__map reveal">
             <iframe
+              id="location-map"
               title="Good Morning Electrical Engineering Academy location on Google Maps"
               src="https://maps.google.com/maps?q=GK-0058-7763&output=embed"
               width="100%"
@@ -652,19 +683,21 @@
             <div class="contact__card">
               <div class="contact__card-icon"><i class="fas fa-phone" aria-hidden="true"></i></div>
               <h3>Phone</h3>
-              <a href="tel:+233557210192" class="contact__link">055 721 0192</a>
-              <a href="tel:+233244471091" class="contact__link">024 447 1091</a>
+              <div id="contact-phones">
+                <a href="tel:+233557210192" class="contact__link">055 721 0192</a>
+                <a href="tel:+233244471091" class="contact__link">024 447 1091</a>
+              </div>
             </div>
             <div class="contact__card">
               <div class="contact__card-icon"><i class="fas fa-envelope" aria-hidden="true"></i></div>
               <h3>Email</h3>
-              <a href="mailto:goodmorningelectricals934@gmail.com" class="contact__link">goodmorningelectricals934@gmail.com</a>
+              <a href="mailto:goodmorningelectricals934@gmail.com" class="contact__link" id="contact-email">goodmorningelectricals934@gmail.com</a>
             </div>
             <div class="contact__actions">
-              <a href="tel:+233557210192" class="btn btn--primary">
+              <a href="tel:+233557210192" class="btn btn--primary" id="contact-call">
                 <i class="fas fa-phone-alt" aria-hidden="true"></i> Call Now
               </a>
-              <a href="https://wa.me/233557210192?text=Hello%2C%20I%20am%20interested%20in%20enrolling%20at%20Good%20Morning%20Electrical%20Engineering%20Academy." class="btn btn--whatsapp" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/233557210192?text=Hello%2C%20I%20am%20interested%20in%20enrolling%20at%20Good%20Morning%20Electrical%20Engineering%20Academy." class="btn btn--whatsapp" id="contact-whatsapp" target="_blank" rel="noopener noreferrer">
                 <i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp Us
               </a>
             </div>
@@ -717,11 +750,11 @@
       <div class="footer__grid">
         <div class="footer__brand">
           <a href="#hero" class="footer__logo">
-            <i class="fas fa-bolt" aria-hidden="true"></i>
-            <span>Good Morning Electrical Academy</span>
+            <img src="assets/logo.png" alt="" class="site-logo footer__logo-img" width="48" height="48">
+            <span id="footer-brand-name">Good Morning Electrical Academy</span>
           </a>
-          <p>Ghana's premier vocational training institution for electrical engineering. Practical skills, expert training, real opportunities.</p>
-          <div class="footer__social">
+          <p id="footer-tagline">Ghana's premier vocational training institution for electrical engineering. Practical skills, expert training, real opportunities.</p>
+          <div class="footer__social" id="footer-social">
             <a href="#" aria-label="Facebook" class="footer__social-link"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
             <a href="#" aria-label="Instagram" class="footer__social-link"><i class="fab fa-instagram" aria-hidden="true"></i></a>
             <a href="#" aria-label="Twitter / X" class="footer__social-link"><i class="fab fa-x-twitter" aria-hidden="true"></i></a>
@@ -737,12 +770,14 @@
             <li><a href="#facilities">Facilities</a></li>
             <li><a href="#journey">Student Journey</a></li>
             <li><a href="#careers">Careers</a></li>
+            <li><a href="#staff">Our Team</a></li>
+            <li><a href="#gallery">Gallery</a></li>
             <li><a href="#faq">FAQ</a></li>
           </ul>
         </div>
         <div class="footer__links">
           <h4>Programmes</h4>
-          <ul>
+          <ul id="footer-programmes-list">
             <li><a href="#programmes">Electrical Engineering Technology</a></li>
             <li><a href="#programmes">Marine Electrical Engineering</a></li>
             <li><a href="#programmes">Industrial Installation Works</a></li>
@@ -751,7 +786,7 @@
         </div>
         <div class="footer__contact">
           <h4>Contact</h4>
-          <ul>
+          <ul id="footer-contact-list">
             <li><i class="fas fa-map-marker-alt" aria-hidden="true"></i> KPONE-KOMKOPE, Plot No. 4</li>
             <li><i class="fas fa-phone" aria-hidden="true"></i> <a href="tel:+233557210192">055 721 0192</a></li>
             <li><i class="fas fa-phone" aria-hidden="true"></i> <a href="tel:+233244471091">024 447 1091</a></li>
@@ -760,8 +795,9 @@
         </div>
       </div>
       <div class="footer__bottom">
-        <p>&copy; <span id="year"></span> Good Morning Electrical Engineering Academy. All rights reserved.</p>
-        <p>Practical Skills. Expert Training. Real Opportunities.</p>
+        <p>&copy; <span id="year"></span> <span id="footer-copyright">Good Morning Electrical Engineering Academy</span>. All rights reserved.</p>
+        <p id="footer-tagline-2">Practical Skills. Expert Training. Real Opportunities.</p>
+        <p class="footer__admin"><a href="admin.html">Admin Dashboard</a></p>
       </div>
     </div>
   </footer>
@@ -776,6 +812,8 @@
     <i class="fab fa-whatsapp" aria-hidden="true"></i>
   </a>
 
+  <script src="cms-store.js"></script>
+  <script src="cms-render.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

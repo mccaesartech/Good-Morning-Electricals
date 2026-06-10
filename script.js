@@ -106,29 +106,34 @@
 
   window.addEventListener('scroll', highlightNav, { passive: true });
 
-  const revealElements = document.querySelectorAll('.reveal');
+  function initReveal() {
+    const revealElements = document.querySelectorAll('.reveal:not(.visible)');
 
-  if ('IntersectionObserver' in window) {
-    const revealObserver = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
-    );
+    if ('IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      );
 
-    revealElements.forEach(function (el) {
-      revealObserver.observe(el);
-    });
-  } else {
-    revealElements.forEach(function (el) {
-      el.classList.add('visible');
-    });
+      revealElements.forEach(function (el) {
+        revealObserver.observe(el);
+      });
+    } else {
+      revealElements.forEach(function (el) {
+        el.classList.add('visible');
+      });
+    }
   }
+
+  window.GME_initReveal = initReveal;
+  initReveal();
 
   document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
     anchor.addEventListener('click', function (e) {
@@ -214,17 +219,22 @@
     });
   }
 
-  document.querySelectorAll('.faq-item').forEach(function (item) {
-    item.addEventListener('toggle', function () {
-      if (item.open) {
-        document.querySelectorAll('.faq-item').forEach(function (other) {
-          if (other !== item && other.open) {
-            other.open = false;
-          }
-        });
-      }
+  function initFaq() {
+    document.querySelectorAll('.faq-item').forEach(function (item) {
+      item.addEventListener('toggle', function () {
+        if (item.open) {
+          document.querySelectorAll('.faq-item').forEach(function (other) {
+            if (other !== item && other.open) {
+              other.open = false;
+            }
+          });
+        }
+      });
     });
-  });
+  }
+
+  window.GME_initFaq = initFaq;
+  initFaq();
 
   highlightNav();
 })();

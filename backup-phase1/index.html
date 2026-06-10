@@ -11,13 +11,12 @@
   <meta property="og:description" content="Start your journey to a successful career in electrical engineering. Practical skills, expert training, real opportunities.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="en_GH">
-  <meta property="og:image" content="assets/logo.png">
   <title>Good Morning Electrical Engineering Academy | Admissions Open</title>
   <link rel="icon" id="site-favicon" href="assets/logo.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -30,10 +29,10 @@
   <header class="header" id="header">
     <nav class="nav container" aria-label="Main navigation">
       <a href="#hero" class="nav__logo" aria-label="Good Morning Electrical Engineering Academy — Home">
-        <img src="assets/logo.png" alt="" class="site-logo nav__logo-img" width="56" height="56">
+        <img src="assets/logo.png" alt="Good Morning Electrical Engineering Academy" class="site-logo nav__logo-img" width="48" height="48">
         <span class="nav__logo-text">
           <span class="nav__logo-name" id="nav-logo-name">Good Morning</span>
-          <span class="nav__logo-sub" id="nav-logo-sub">Electrical Engineering Academy</span>
+          <span class="nav__logo-sub" id="nav-logo-sub">Electrical Academy</span>
         </span>
       </a>
 
@@ -45,12 +44,14 @@
 
       <ul class="nav__menu" id="nav-menu">
         <li><a href="#about" class="nav__link">About</a></li>
+        <li><a href="#why-us" class="nav__link">Why Us</a></li>
         <li><a href="#programmes" class="nav__link">Programmes</a></li>
         <li><a href="#facilities" class="nav__link">Facilities</a></li>
+        <li><a href="#journey" class="nav__link">Journey</a></li>
         <li><a href="#careers" class="nav__link">Careers</a></li>
         <li><a href="#staff" class="nav__link">Team</a></li>
+        <li><a href="#admissions" class="nav__link nav__link--cta">Enroll Now</a></li>
         <li><a href="#contact" class="nav__link">Contact</a></li>
-        <li class="nav__cta-item"><a href="#admissions" class="nav__link nav__link--cta">Enroll Now</a></li>
       </ul>
     </nav>
   </header>
@@ -62,74 +63,46 @@
       <div class="hero__bg">
         <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1920&q=80" alt="" class="hero__bg-img" id="hero-bg-img" loading="eager" fetchpriority="high">
         <div class="hero__overlay"></div>
-        <div class="hero__pattern" aria-hidden="true"></div>
       </div>
       <div class="hero__content container">
-        <div class="hero__layout">
-          <div class="hero__main">
-            <span class="hero__badge fade-in" id="hero-badge">Admissions Open 2026</span>
-            <h1 class="hero__title fade-in" id="hero-heading">
-              <span id="hero-title">Power Your Future in<br>Electrical Engineering</span>
-            </h1>
-            <p class="hero__subtitle fade-in" id="hero-subtitle">
-              Ghana's trusted vocational academy for hands-on electrical training, industry certification, and real career pathways.
-            </p>
-            <ul class="hero__highlights fade-in" id="hero-highlights">
-              <li><i class="fas fa-check" aria-hidden="true"></i> Practical Skills</li>
-              <li><i class="fas fa-check" aria-hidden="true"></i> Expert Training</li>
-              <li><i class="fas fa-check" aria-hidden="true"></i> Real Opportunities</li>
-            </ul>
-            <p class="hero__tagline fade-in visually-hidden" id="hero-tagline">Practical Skills. Expert Training. Real Opportunities.</p>
-            <div class="hero__actions fade-in">
-              <a href="#admissions" class="btn btn--primary btn--lg">
-                <i class="fas fa-user-graduate" aria-hidden="true"></i> Enroll Today
-              </a>
-              <a href="#programmes" class="btn btn--outline btn--lg">
-                <i class="fas fa-book-open" aria-hidden="true"></i> View Programmes
-              </a>
-            </div>
+        <img src="assets/logo.png" alt="" class="hero__logo site-logo fade-in" width="100" height="100" aria-hidden="true">
+        <span class="hero__badge fade-in" id="hero-badge">Admissions Open!</span>
+        <h1 class="hero__title fade-in" id="hero-heading">
+          <span id="hero-title">Good Morning Electrical<br>Engineering Academy</span>
+        </h1>
+        <p class="hero__subtitle fade-in" id="hero-subtitle">
+          Start your journey to a successful career in the dynamic world of electrical engineering.
+        </p>
+        <p class="hero__tagline fade-in">
+          <i class="fas fa-check-circle" aria-hidden="true"></i>
+          <span id="hero-tagline">Practical Skills. Expert Training. Real Opportunities.</span>
+        </p>
+        <div class="hero__actions fade-in">
+          <a href="#admissions" class="btn btn--primary">
+            <i class="fas fa-user-graduate" aria-hidden="true"></i> Enroll Today
+          </a>
+          <a href="#programmes" class="btn btn--outline">
+            <i class="fas fa-book-open" aria-hidden="true"></i> View Programmes
+          </a>
+        </div>
+        <div class="hero__stats fade-in" id="hero-stats">
+          <div class="hero__stat">
+            <span class="hero__stat-number">4+</span>
+            <span class="hero__stat-label">Programmes</span>
           </div>
-          <aside class="hero__panel fade-in" aria-label="Academy highlights">
-            <div class="hero__panel-card">
-              <span class="hero__panel-label">Established</span>
-              <strong class="hero__panel-year" id="hero-established">2015</strong>
-              <p>Building skilled electrical professionals through vocational excellence in Kpone-Komkope, Ghana.</p>
-            </div>
-            <div class="hero__panel-card hero__panel-card--accent">
-              <i class="fas fa-bolt" aria-hidden="true"></i>
-              <p><strong id="hero-panel-cta">100% Practical Focus</strong> — learn with real tools, real projects, and expert instructors.</p>
-            </div>
-          </aside>
+          <div class="hero__stat">
+            <span class="hero__stat-number">100%</span>
+            <span class="hero__stat-label">Practical Focus</span>
+          </div>
+          <div class="hero__stat">
+            <span class="hero__stat-number">GH</span>
+            <span class="hero__stat-label">Certified Training</span>
+          </div>
         </div>
       </div>
-      <a href="#stats" class="hero__scroll" aria-label="Scroll to statistics">
-        <span>Explore</span>
+      <a href="#about" class="hero__scroll" aria-label="Scroll to about section">
         <i class="fas fa-chevron-down" aria-hidden="true"></i>
       </a>
-    </section>
-
-    <!-- Statistics Band -->
-    <section class="stats-band" id="stats" aria-label="Academy impact statistics">
-      <div class="container">
-        <div class="stats-band__grid" id="stats-grid">
-          <div class="stats-band__item reveal">
-            <span class="stats-band__number" data-count="500">500+</span>
-            <span class="stats-band__label">Students Trained</span>
-          </div>
-          <div class="stats-band__item reveal">
-            <span class="stats-band__number" data-count="4">4</span>
-            <span class="stats-band__label">Programmes Offered</span>
-          </div>
-          <div class="stats-band__item reveal">
-            <span class="stats-band__number" data-count="95">95%</span>
-            <span class="stats-band__label">Employment Rate</span>
-          </div>
-          <div class="stats-band__item reveal">
-            <span class="stats-band__number" data-count="10">10+</span>
-            <span class="stats-band__label">Years of Excellence</span>
-          </div>
-        </div>
-      </div>
     </section>
 
     <!-- About Section -->
@@ -549,7 +522,7 @@
     </section>
 
     <!-- Admissions CTA -->
-    <section class="section admissions" id="admissions" aria-labelledby="admissions-title">
+    <section class="section admissions" id="admissions" aria-labelledby="admissions-heading">
       <div class="admissions__bg">
         <img src="https://images.unsplash.com/photo-1454165804603-c011dffb6f88?w=1920&q=80" alt="" id="admissions-bg-img" loading="lazy">
         <div class="admissions__overlay"></div>
@@ -777,11 +750,8 @@
       <div class="footer__grid">
         <div class="footer__brand">
           <a href="#hero" class="footer__logo">
-            <img src="assets/logo.png" alt="" class="site-logo footer__logo-img" width="56" height="56">
-            <span class="footer__brand-text">
-              <span id="footer-brand-line1">Good Morning</span>
-              <span id="footer-brand-line2">Electrical Engineering Academy</span>
-            </span>
+            <img src="assets/logo.png" alt="" class="site-logo footer__logo-img" width="48" height="48">
+            <span id="footer-brand-name">Good Morning Electrical Academy</span>
           </a>
           <p id="footer-tagline">Ghana's premier vocational training institution for electrical engineering. Practical skills, expert training, real opportunities.</p>
           <div class="footer__social" id="footer-social">

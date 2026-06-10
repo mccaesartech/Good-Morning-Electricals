@@ -220,55 +220,21 @@
   }
 
   function initFaq() {
-    /* Event delegation — safe when CMS re-renders FAQ items */
-  }
-
-  document.addEventListener('toggle', function (e) {
-    if (!e.target.classList || !e.target.classList.contains('faq-item')) return;
-    if (e.target.open) {
-      document.querySelectorAll('.faq-item').forEach(function (other) {
-        if (other !== e.target && other.open) other.open = false;
+    document.querySelectorAll('.faq-item').forEach(function (item) {
+      item.addEventListener('toggle', function () {
+        if (item.open) {
+          document.querySelectorAll('.faq-item').forEach(function (other) {
+            if (other !== item && other.open) {
+              other.open = false;
+            }
+          });
+        }
       });
-    }
-  }, true);
+    });
+  }
 
   window.GME_initFaq = initFaq;
-
-  function initStatsCounter() {
-    var numbers = document.querySelectorAll('.stats-band__number[data-count]');
-    if (!numbers.length || !('IntersectionObserver' in window)) return;
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        var el = entry.target;
-        var target = parseInt(el.getAttribute('data-count'), 10);
-        if (isNaN(target)) return;
-
-        var suffix = el.textContent.replace(/[0-9]/g, '');
-        var start = 0;
-        var duration = 1400;
-        var startTime = null;
-
-        function step(timestamp) {
-          if (!startTime) startTime = timestamp;
-          var progress = Math.min((timestamp - startTime) / duration, 1);
-          var eased = 1 - Math.pow(1 - progress, 3);
-          var current = Math.floor(start + (target - start) * eased);
-          el.textContent = current + suffix;
-          if (progress < 1) requestAnimationFrame(step);
-        }
-
-        requestAnimationFrame(step);
-        observer.unobserve(el);
-      });
-    }, { threshold: 0.4 });
-
-    numbers.forEach(function (n) { observer.observe(n); });
-  }
-
-  window.GME_initStats = initStatsCounter;
-  initStatsCounter();
+  initFaq();
 
   highlightNav();
 })();

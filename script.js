@@ -1,6 +1,14 @@
 (function () {
   'use strict';
 
+  document.addEventListener('error', function (e) {
+    if (!e.target || e.target.tagName !== 'IMG' || e.target.dataset.fallbackApplied) return;
+    e.target.dataset.fallbackApplied = '1';
+    if (window.GME_CMS && GME_CMS.getFallbackImage) {
+      e.target.src = GME_CMS.getFallbackImage();
+    }
+  }, true);
+
   const header = document.getElementById('header');
   const navToggle = document.getElementById('nav-toggle');
   const navMenu = document.getElementById('nav-menu');

@@ -1909,7 +1909,15 @@ address { font-style: normal; }
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--secondary-dark);
+  margin-bottom: 0.5rem;
+}
+
+.staff-card__qual {
+  font-size: 0.8125rem;
+  color: var(--primary);
+  font-weight: 500;
   margin-bottom: 0.75rem;
+  opacity: 0.85;
 }
 
 .staff-card__bio {

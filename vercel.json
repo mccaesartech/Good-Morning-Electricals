@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "installCommand": "cd admin && npm install",
+  "buildCommand": "cd admin && npm run build",
+  "builds": [
+    {
+      "src": "admin/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/admin(.*)",
+      "dest": "/admin$1"
+    }
+  ]
+}

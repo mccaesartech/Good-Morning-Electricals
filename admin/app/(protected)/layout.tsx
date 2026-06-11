@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
 import AdminShell from '@/components/AdminShell';
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const profile = await requireAdmin(supabase);
 
@@ -11,13 +11,5 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect('/login?error=unauthorized');
   }
 
-  return (
-    <AdminShell
-      email={profile.email}
-      title="Dashboard"
-      subtitle="Manage your academy website content"
-    >
-      {children}
-    </AdminShell>
-  );
+  return <AdminShell email={profile.email}>{children}</AdminShell>;
 }

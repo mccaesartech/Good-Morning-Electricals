@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import PageHeader from '@/components/ui/PageHeader';
 
 async function getCount(table: string) {
   const supabase = await createClient();
@@ -16,63 +18,69 @@ async function getRecentActivity() {
   return data ?? [];
 }
 
+const QUICK_LINKS = [
+  { href: '/programmes', label: 'Programmes' },
+  { href: '/staff', label: 'Staff' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/settings', label: 'Site Settings' }
+];
+
 export default async function DashboardPage() {
-  const [programmes, staff, gallery, testimonials, activity] = await Promise.all([
+  const [programmes, staff, gallery, testimonials, faq, activity] = await Promise.all([
     getCount('programmes'),
     getCount('staff'),
     getCount('gallery'),
     getCount('testimonials'),
+    getCount('faq'),
     getRecentActivity()
   ]);
 
   return (
     <>
+      <PageHeader
+        title="Dashboard"
+        description="Manage your academy website content. Changes sync to Supabase instantly."
+      />
+
       <div className="dash-stats">
         <div className="dash-card">
           <div className="dash-card__icon gold">🎓</div>
-          <div>
-            <strong>{programmes}</strong>
-            <span>Programmes</span>
-          </div>
+          <div><strong>{programmes}</strong><span>Programmes</span></div>
         </div>
         <div className="dash-card">
           <div className="dash-card__icon blue">👥</div>
-          <div>
-            <strong>{staff}</strong>
-            <span>Staff</span>
-          </div>
+          <div><strong>{staff}</strong><span>Staff</span></div>
         </div>
         <div className="dash-card">
           <div className="dash-card__icon green">🖼️</div>
-          <div>
-            <strong>{gallery}</strong>
-            <span>Gallery Photos</span>
-          </div>
+          <div><strong>{gallery}</strong><span>Gallery Photos</span></div>
         </div>
         <div className="dash-card">
           <div className="dash-card__icon purple">💬</div>
-          <div>
-            <strong>{testimonials}</strong>
-            <span>Testimonials</span>
-          </div>
+          <div><strong>{testimonials}</strong><span>Testimonials</span></div>
+        </div>
+        <div className="dash-card">
+          <div className="dash-card__icon gold">❓</div>
+          <div><strong>{faq}</strong><span>FAQ Items</span></div>
         </div>
       </div>
 
       <div className="grid-2">
         <div className="card">
           <h3>Quick Actions</h3>
-          <p>Content editing modules will be available in Phase D.</p>
-          <ul style={{ marginTop: '0.75rem' }}>
-            <li>Site Settings, Hero, Programmes, and more</li>
-            <li>Image uploads to Supabase Storage</li>
-            <li>Draft / Publish workflow</li>
-          </ul>
+          <div className="quick-links">
+            {QUICK_LINKS.map((link) => (
+              <Link key={link.href} href={link.href} className="btn btn-secondary btn-sm">
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
         <div className="card">
           <h3>Publishing</h3>
           <ol>
-            <li>Edit content in the admin dashboard (Phase D).</li>
-            <li>Changes save to Supabase instantly.</li>
+            <li>Edit content in any section below.</li>
+            <li>Set status to <strong>Published</strong> when ready.</li>
             <li>The public website loads published content automatically.</li>
           </ol>
         </div>
@@ -83,7 +91,7 @@ export default async function DashboardPage() {
         {activity.length === 0 ? (
           <p>No activity logged yet.</p>
         ) : (
-          <ul>
+          <ul className="activity-list">
             {activity.map((item, i) => (
               <li key={i}>
                 <strong>{item.action}</strong> — {item.summary || item.entity}
@@ -94,6 +102,9 @@ export default async function DashboardPage() {
             ))}
           </ul>
         )}
+        <Link href="/activity" className="btn btn-ghost-dark btn-sm" style={{ marginTop: '1rem' }}>
+          View full activity log →
+        </Link>
       </div>
     </>
   );

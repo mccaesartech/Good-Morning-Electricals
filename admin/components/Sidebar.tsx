@@ -2,35 +2,43 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Logo from './Logo';
 import LogoutButton from './LogoutButton';
 
-type NavItem = {
-  href: string;
-  label: string;
-  disabled?: boolean;
-  active?: boolean;
-};
+type NavItem = { href: string; label: string };
 
 const NAV: { group: string; items: NavItem[] }[] = [
-  { group: 'Overview', items: [{ href: '/dashboard', label: 'Dashboard', active: true }] },
+  {
+    group: 'Overview',
+    items: [
+      { href: '/dashboard', label: 'Dashboard' },
+      { href: '/activity', label: 'Activity Log' }
+    ]
+  },
   {
     group: 'Content',
     items: [
-      { href: '#', label: 'Hero Section', disabled: true },
-      { href: '#', label: 'Programmes', disabled: true },
-      { href: '#', label: 'Facilities', disabled: true },
-      { href: '#', label: 'Staff', disabled: true },
-      { href: '#', label: 'Gallery', disabled: true }
+      { href: '/hero', label: 'Hero Section' },
+      { href: '/programmes', label: 'Programmes' },
+      { href: '/facilities', label: 'Facilities' },
+      { href: '/staff', label: 'Staff' },
+      { href: '/gallery', label: 'Gallery' },
+      { href: '/testimonials', label: 'Testimonials' },
+      { href: '/faq', label: 'FAQ' }
     ]
   },
   {
     group: 'Settings',
     items: [
-      { href: '#', label: 'Site Settings', disabled: true },
-      { href: '#', label: 'Contact Info', disabled: true }
+      { href: '/settings', label: 'Site Settings' },
+      { href: '/contact', label: 'Contact Info' }
     ]
   }
 ];
+
+function isActive(pathname: string, href: string): boolean {
+  return pathname === href || (href !== '/dashboard' && pathname.startsWith(`${href}/`));
+}
 
 export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
@@ -38,8 +46,7 @@ export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: (
   return (
     <aside className={`sidebar${open ? ' open' : ''}`}>
       <div className="sidebar__brand">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/logo.png" alt="" width={40} height={40} style={{ borderRadius: 8 }} />
+        <Logo width={40} height={40} style={{ borderRadius: 8 }} alt="" />
         <div>
           <strong>GME Admin</strong>
           <span>Content Manager</span>
@@ -52,14 +59,12 @@ export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: (
             <p className="sidebar__group">{section.group}</p>
             {section.items.map((item) => (
               <Link
-                key={item.label}
-                href={item.disabled ? '#' : item.href}
-                className={`nav-item${pathname === item.href ? ' active' : ''}${item.disabled ? ' disabled' : ''}`}
-                aria-disabled={item.disabled || undefined}
+                key={item.href}
+                href={item.href}
+                className={`nav-item${isActive(pathname, item.href) ? ' active' : ''}`}
                 onClick={onClose}
               >
                 {item.label}
-                {item.disabled && <span className="badge-phase">Phase D</span>}
               </Link>
             ))}
           </div>
@@ -67,7 +72,7 @@ export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: (
       </nav>
 
       <div className="sidebar__footer">
-        <Link href="/" target="_blank" className="btn btn-ghost btn-sm" style={{ textAlign: 'center' }}>
+        <Link href="/" target="_blank" className="btn btn-ghost btn-sm sidebar-view-site">
           View Site
         </Link>
         <LogoutButton />

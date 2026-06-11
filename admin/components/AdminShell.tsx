@@ -2,17 +2,14 @@
 
 import { useState } from 'react';
 import Sidebar from './Sidebar';
+import TopbarTitle from './TopbarTitle';
 
 export default function AdminShell({
   children,
-  email,
-  title,
-  subtitle
+  email
 }: {
   children: React.ReactNode;
   email: string;
-  title: string;
-  subtitle: string;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -29,10 +26,7 @@ export default function AdminShell({
           >
             ☰
           </button>
-          <div className="topbar__title">
-            <h2>{title}</h2>
-            <p>{subtitle}</p>
-          </div>
+          <TopbarTitle />
           <div className="topbar__actions">
             <div className="topbar__user">
               <span>🛡️</span>

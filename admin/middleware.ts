@@ -1,14 +1,35 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
+const PUBLIC_PATHS = ['/login', '/auth/callback'];
+
+const PROTECTED_PREFIXES = [
+  '/dashboard',
+  '/programmes',
+  '/staff',
+  '/gallery',
+  '/testimonials',
+  '/faq',
+  '/facilities',
+  '/hero',
+  '/settings',
+  '/contact',
+  '/activity'
+];
+
+function isPublic(path: string): boolean {
+  return PUBLIC_PATHS.some((p) => path === p || path.startsWith(`${p}/`));
+}
+
+function isProtected(path: string): boolean {
+  return PROTECTED_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
+}
+
 export async function middleware(request: NextRequest) {
   const { supabase, user, supabaseResponse } = await updateSession(request);
   const path = request.nextUrl.pathname;
 
-  const isLogin = path === '/login' || path.startsWith('/login/');
-  const isDashboard = path === '/dashboard' || path.startsWith('/dashboard/');
-
-  if (isDashboard) {
+  if (isProtected(path)) {
     if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = '/login';
@@ -26,7 +47,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (isLogin && user) {
+  if (isPublic(path) && path.startsWith('/login') && user) {
     const { data: profile } = await supabase.rpc('get_admin_profile');
     if (profile) {
       const url = request.nextUrl.clone();
@@ -39,5 +60,19 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/login/:path*']
+  matcher: [
+    '/dashboard/:path*',
+    '/programmes/:path*',
+    '/staff/:path*',
+    '/gallery/:path*',
+    '/testimonials/:path*',
+    '/faq/:path*',
+    '/facilities/:path*',
+    '/hero/:path*',
+    '/settings/:path*',
+    '/contact/:path*',
+    '/activity/:path*',
+    '/login',
+    '/login/:path*'
+  ]
 };

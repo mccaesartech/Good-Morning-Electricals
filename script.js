@@ -1,12 +1,12 @@
 (function () {
   'use strict';
 
+  var GME_FALLBACK_IMAGE = window.GME_FALLBACK_IMAGE || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80';
+
   document.addEventListener('error', function (e) {
     if (!e.target || e.target.tagName !== 'IMG' || e.target.dataset.fallbackApplied) return;
     e.target.dataset.fallbackApplied = '1';
-    if (window.GME_CMS && GME_CMS.getFallbackImage) {
-      e.target.src = GME_CMS.getFallbackImage();
-    }
+    e.target.src = GME_FALLBACK_IMAGE;
   }, true);
 
   const header = document.getElementById('header');

@@ -1,0 +1,7 @@
+{
+  "name": "good-morning-electricals",
+  "private": true,
+  "scripts": {
+    "vercel-build": "cd admin && npm install && npm run build"
+  }
+}

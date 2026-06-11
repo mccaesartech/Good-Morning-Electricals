@@ -1,21 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import type { AdminProfile } from '@/lib/auth';
 import Sidebar from './Sidebar';
 import TopbarTitle from './TopbarTitle';
 
 export default function AdminShell({
   children,
-  email
+  profile
 }: {
   children: React.ReactNode;
-  email: string;
+  profile: AdminProfile;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="admin-app">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar profile={profile} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="admin-shell">
         <header className="topbar">
           <button
@@ -30,7 +31,7 @@ export default function AdminShell({
           <div className="topbar__actions">
             <div className="topbar__user">
               <span>🛡️</span>
-              <span>{email}</span>
+              <span>{profile.email}</span>
             </div>
           </div>
         </header>

@@ -1,11 +1,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { AdminRole, Permission } from '@/lib/permissions';
 
 export type AdminProfile = {
   id: string;
   email: string;
   full_name: string | null;
-  role: 'superadmin' | 'editor';
+  role: AdminRole;
   active: boolean;
+  last_login_at: string | null;
+  custom_permissions: Permission[] | null;
+  permissions: Permission[];
 };
 
 export async function getAdminProfile(supabase: SupabaseClient): Promise<AdminProfile | null> {

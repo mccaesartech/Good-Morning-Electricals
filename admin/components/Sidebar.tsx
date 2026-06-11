@@ -2,36 +2,41 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import type { AdminProfile } from '@/lib/auth';
+import { hasPermission, type Permission } from '@/lib/permissions';
 import Logo from './Logo';
 import LogoutButton from './LogoutButton';
 
-type NavItem = { href: string; label: string };
+type NavItem = { href: string; label: string; permission: Permission | Permission[] | 'any' };
 
 const NAV: { group: string; items: NavItem[] }[] = [
   {
     group: 'Overview',
     items: [
-      { href: '/dashboard', label: 'Dashboard' },
-      { href: '/activity', label: 'Activity Log' }
+      { href: '/dashboard', label: 'Dashboard', permission: 'any' },
+      { href: '/enquiries', label: 'Enquiries', permission: ['view_enquiries', 'manage_enquiries'] },
+      { href: '/enrolments', label: 'Enrolments', permission: ['view_enrolments', 'manage_enrolments'] },
+      { href: '/activity', label: 'Activity Log', permission: ['view_activity', 'manage_users'] }
     ]
   },
   {
     group: 'Content',
     items: [
-      { href: '/hero', label: 'Hero Section' },
-      { href: '/programmes', label: 'Programmes' },
-      { href: '/facilities', label: 'Facilities' },
-      { href: '/staff', label: 'Staff' },
-      { href: '/gallery', label: 'Gallery' },
-      { href: '/testimonials', label: 'Testimonials' },
-      { href: '/faq', label: 'FAQ' }
+      { href: '/hero', label: 'Hero Section', permission: 'manage_hero' },
+      { href: '/programmes', label: 'Programmes', permission: 'manage_programmes' },
+      { href: '/facilities', label: 'Facilities', permission: 'manage_facilities' },
+      { href: '/staff', label: 'Staff', permission: 'manage_staff' },
+      { href: '/gallery', label: 'Gallery', permission: 'manage_gallery' },
+      { href: '/testimonials', label: 'Testimonials', permission: 'manage_testimonials' },
+      { href: '/faq', label: 'FAQ', permission: 'manage_faq' }
     ]
   },
   {
     group: 'Settings',
     items: [
-      { href: '/settings', label: 'Site Settings' },
-      { href: '/contact', label: 'Contact Info' }
+      { href: '/settings', label: 'Site Settings', permission: 'manage_settings' },
+      { href: '/contact', label: 'Contact Info', permission: 'manage_contact' },
+      { href: '/users', label: 'User Management', permission: 'manage_users' }
     ]
   }
 ];
@@ -40,8 +45,17 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || (href !== '/dashboard' && pathname.startsWith(`${href}/`));
 }
 
-export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => void }) {
+export default function Sidebar({
+  profile,
+  open,
+  onClose
+}: {
+  profile: AdminProfile;
+  open?: boolean;
+  onClose?: () => void;
+}) {
   const pathname = usePathname();
+  const perms = profile.permissions;
 
   return (
     <aside className={`sidebar${open ? ' open' : ''}`}>
@@ -54,21 +68,28 @@ export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: (
       </div>
 
       <nav className="sidebar__nav">
-        {NAV.map((section) => (
-          <div key={section.group}>
-            <p className="sidebar__group">{section.group}</p>
-            {section.items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`nav-item${isActive(pathname, item.href) ? ' active' : ''}`}
-                onClick={onClose}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        ))}
+        {NAV.map((section) => {
+          const visible = section.items.filter((item) =>
+            hasPermission(perms, item.permission)
+          );
+          if (visible.length === 0) return null;
+
+          return (
+            <div key={section.group}>
+              <p className="sidebar__group">{section.group}</p>
+              {visible.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`nav-item${isActive(pathname, item.href) ? ' active' : ''}`}
+                  onClick={onClose}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          );
+        })}
       </nav>
 
       <div className="sidebar__footer">

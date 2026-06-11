@@ -7,7 +7,12 @@ export type AuditAction =
   | 'unpublished'
   | 'deleted'
   | 'uploaded'
-  | 'restored';
+  | 'restored'
+  | 'login'
+  | 'logout'
+  | 'activated'
+  | 'deactivated'
+  | 'password_reset';
 
 export async function logActivity(
   action: AuditAction,

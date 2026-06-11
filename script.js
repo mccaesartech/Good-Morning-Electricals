@@ -158,74 +158,7 @@
     });
   });
 
-  if (contactForm) {
-    contactForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const name = document.getElementById('name');
-      const email = document.getElementById('email');
-      const message = document.getElementById('message');
-      const nameError = document.getElementById('name-error');
-      const emailError = document.getElementById('email-error');
-      const messageError = document.getElementById('message-error');
-      const formSuccess = document.getElementById('form-success');
-
-      let valid = true;
-
-      nameError.textContent = '';
-      emailError.textContent = '';
-      messageError.textContent = '';
-      name.classList.remove('error');
-      email.classList.remove('error');
-      message.classList.remove('error');
-      formSuccess.hidden = true;
-
-      if (!name.value.trim()) {
-        nameError.textContent = 'Please enter your full name.';
-        name.classList.add('error');
-        valid = false;
-      }
-
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!email.value.trim()) {
-        emailError.textContent = 'Please enter your email address.';
-        email.classList.add('error');
-        valid = false;
-      } else if (!emailPattern.test(email.value.trim())) {
-        emailError.textContent = 'Please enter a valid email address.';
-        email.classList.add('error');
-        valid = false;
-      }
-
-      if (!message.value.trim()) {
-        messageError.textContent = 'Please enter your message.';
-        message.classList.add('error');
-        valid = false;
-      }
-
-      if (!valid) {
-        const firstError = contactForm.querySelector('.error');
-        if (firstError) firstError.focus();
-        return;
-      }
-
-      const programme = document.getElementById('programme');
-      const phone = document.getElementById('phone');
-      const subject = encodeURIComponent('Enrollment Inquiry - Good Morning Electrical Academy');
-      const body = encodeURIComponent(
-        'Name: ' + name.value.trim() + '\n' +
-        'Email: ' + email.value.trim() + '\n' +
-        'Phone: ' + (phone.value.trim() || 'Not provided') + '\n' +
-        'Programme: ' + (programme.options[programme.selectedIndex].text || 'Not specified') + '\n\n' +
-        'Message:\n' + message.value.trim()
-      );
-
-      window.location.href = 'mailto:goodmorningelectricals934@gmail.com?subject=' + subject + '&body=' + body;
-
-      formSuccess.hidden = false;
-      contactForm.reset();
-    });
-  }
+  /* Contact + enrolment forms handled by js/form-submit.js → Supabase */
 
   function initFaq() {
     /* Event delegation — safe when CMS re-renders FAQ items */

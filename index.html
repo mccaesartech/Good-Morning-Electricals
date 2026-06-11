@@ -84,8 +84,8 @@
             </ul>
             <p class="hero__tagline fade-in visually-hidden" id="hero-tagline">Practical Skills. Expert Training. Real Opportunities.</p>
             <div class="hero__actions fade-in">
-              <a href="#admissions" class="btn btn--primary btn--lg" id="hero-cta-primary">
-                <i class="fas fa-user-graduate" aria-hidden="true"></i> <span>Enroll Today</span>
+              <a href="#enrol" class="btn btn--primary btn--lg" id="hero-cta-primary" data-open-enrol>
+                <i class="fas fa-user-graduate" aria-hidden="true"></i> <span>Enrol Today</span>
               </a>
               <a href="#programmes" class="btn btn--outline btn--lg" id="hero-cta-secondary">
                 <i class="fas fa-book-open" aria-hidden="true"></i> <span>View Programmes</span>
@@ -380,47 +380,37 @@
           <h2 class="section__title" id="journey-heading">Student Journey</h2>
           <p class="section__desc">From enrollment to employment — your roadmap to a rewarding electrical career.</p>
         </div>
-        <div class="timeline" id="journey-timeline">
-          <div class="timeline__item reveal">
-            <div class="timeline__marker"><i class="fas fa-user-plus" aria-hidden="true"></i></div>
-            <div class="timeline__content">
-              <span class="timeline__step">Step 1</span>
-              <h3>Enroll</h3>
-              <p>Submit your application, meet our admissions team, and choose the programme that matches your career goals.</p>
-            </div>
-          </div>
-          <div class="timeline__item reveal">
-            <div class="timeline__marker"><i class="fas fa-book-reader" aria-hidden="true"></i></div>
-            <div class="timeline__content">
-              <span class="timeline__step">Step 2</span>
-              <h3>Learn</h3>
-              <p>Master electrical theory, safety protocols, and technical fundamentals through expert-led classroom instruction.</p>
-            </div>
-          </div>
-          <div class="timeline__item reveal">
-            <div class="timeline__marker"><i class="fas fa-hammer" aria-hidden="true"></i></div>
-            <div class="timeline__content">
-              <span class="timeline__step">Step 3</span>
-              <h3>Practice</h3>
-              <p>Apply your knowledge in hands-on workshops and real project environments under professional supervision.</p>
-            </div>
-          </div>
-          <div class="timeline__item reveal">
-            <div class="timeline__marker"><i class="fas fa-medal" aria-hidden="true"></i></div>
-            <div class="timeline__content">
-              <span class="timeline__step">Step 4</span>
-              <h3>Certification</h3>
-              <p>Earn your nationally recognized certificate demonstrating your competence and readiness for the industry.</p>
-            </div>
-          </div>
-          <div class="timeline__item reveal">
-            <div class="timeline__marker"><i class="fas fa-handshake" aria-hidden="true"></i></div>
-            <div class="timeline__content">
-              <span class="timeline__step">Step 5</span>
-              <h3>Employment</h3>
-              <p>Launch your career as a skilled electrical professional — employed, self-employed, or continuing to advanced studies.</p>
-            </div>
-          </div>
+        <div class="journey-grid" id="journey-timeline">
+          <article class="journey-card reveal">
+            <div class="journey-card__icon"><i class="fas fa-user-plus" aria-hidden="true"></i></div>
+            <span class="journey-card__step">Step 1</span>
+            <h3>Enroll</h3>
+            <p>Submit your application and choose the programme that matches your career goals.</p>
+          </article>
+          <article class="journey-card reveal">
+            <div class="journey-card__icon"><i class="fas fa-book-reader" aria-hidden="true"></i></div>
+            <span class="journey-card__step">Step 2</span>
+            <h3>Learn</h3>
+            <p>Master electrical theory, safety protocols, and technical fundamentals.</p>
+          </article>
+          <article class="journey-card reveal">
+            <div class="journey-card__icon"><i class="fas fa-hammer" aria-hidden="true"></i></div>
+            <span class="journey-card__step">Step 3</span>
+            <h3>Practice</h3>
+            <p>Hands-on workshops and real project environments under expert supervision.</p>
+          </article>
+          <article class="journey-card reveal">
+            <div class="journey-card__icon"><i class="fas fa-medal" aria-hidden="true"></i></div>
+            <span class="journey-card__step">Step 4</span>
+            <h3>Certification</h3>
+            <p>Earn your nationally recognized certificate and industry-ready skills.</p>
+          </article>
+          <article class="journey-card reveal">
+            <div class="journey-card__icon"><i class="fas fa-handshake" aria-hidden="true"></i></div>
+            <span class="journey-card__step">Step 5</span>
+            <h3>Employment</h3>
+            <p>Launch your career — employed, self-employed, or advanced studies.</p>
+          </article>
         </div>
       </div>
     </section>
@@ -561,8 +551,8 @@
         <h2 class="admissions__title" id="admissions-title">Power Your Future. Enroll Today.</h2>
         <p class="admissions__text" id="admissions-text">Admissions are now open for all programmes. Limited seats available — secure your place in Ghana's leading electrical engineering academy.</p>
         <div class="admissions__actions">
-          <a href="#contact" class="btn btn--primary btn--lg" id="admissions-btn-apply">
-            <i class="fas fa-paper-plane" aria-hidden="true"></i> <span>Apply Now</span>
+          <a href="#enrol" class="btn btn--primary btn--lg" id="admissions-btn-apply" data-open-enrol>
+            <i class="fas fa-paper-plane" aria-hidden="true"></i> <span>Enrol Now</span>
           </a>
           <a href="tel:+233557210192" class="btn btn--outline btn--lg" id="admissions-btn-call">
             <i class="fas fa-phone" aria-hidden="true"></i> <span>Call Admissions</span>
@@ -697,6 +687,59 @@
             </iframe>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Online Enrolment -->
+    <section class="section enrol" id="enrol" aria-labelledby="enrol-heading" tabindex="-1">
+      <div class="container">
+        <div class="section__header reveal">
+          <span class="section__label">Apply Today</span>
+          <h2 class="section__title" id="enrol-heading">Enrol Now</h2>
+          <p class="section__desc">Complete the form below to apply. Our admissions team will contact you shortly.</p>
+        </div>
+        <form class="enrol__form reveal" id="enrol-form" novalidate>
+          <div class="enrol__grid">
+            <div class="form-group">
+              <label for="enrol-name">Full Name <span aria-hidden="true">*</span></label>
+              <input type="text" id="enrol-name" name="full_name" required autocomplete="name" placeholder="Your full name">
+            </div>
+            <div class="form-group">
+              <label for="enrol-email">Email <span aria-hidden="true">*</span></label>
+              <input type="email" id="enrol-email" name="email" required autocomplete="email" placeholder="your.email@example.com">
+            </div>
+            <div class="form-group">
+              <label for="enrol-phone">Phone <span aria-hidden="true">*</span></label>
+              <input type="tel" id="enrol-phone" name="phone" required autocomplete="tel" placeholder="e.g. 055 721 0192">
+            </div>
+            <div class="form-group">
+              <label for="enrol-dob">Date of Birth</label>
+              <input type="date" id="enrol-dob" name="date_of_birth">
+            </div>
+            <div class="form-group">
+              <label for="enrol-programme">Programme <span aria-hidden="true">*</span></label>
+              <select id="enrol-programme" name="programme" required>
+                <option value="">Select a programme</option>
+                <option value="Electrical Engineering Technology (Cert II)">Electrical Engineering Technology (Cert II)</option>
+                <option value="Marine Electrical Engineering">Marine Electrical Engineering</option>
+                <option value="Industrial Electrical Installation Works">Industrial Electrical Installation Works</option>
+                <option value="Electrical Monitoring Rewinding">Electrical Monitoring Rewinding</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="enrol-education">Education Level</label>
+              <input type="text" id="enrol-education" name="education_level" placeholder="e.g. WASSCE, BECE">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="enrol-message">Additional Information</label>
+            <textarea id="enrol-message" name="message" rows="3" placeholder="Tell us about your goals (optional)"></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary btn--lg">
+            <i class="fas fa-user-graduate" aria-hidden="true"></i> Submit Application
+          </button>
+          <p class="form-success" hidden role="status">Thank you! Your application was received.</p>
+        </form>
       </div>
     </section>
 
@@ -847,6 +890,7 @@
   <script src="js/supabase-config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/site-data.js"></script>
+  <script src="js/form-submit.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

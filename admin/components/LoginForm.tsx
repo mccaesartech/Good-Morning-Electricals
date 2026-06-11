@@ -45,6 +45,8 @@ export default function LoginForm() {
       return;
     }
 
+    await supabase.rpc('record_admin_login');
+
     router.push(redirectTo);
     router.refresh();
   }

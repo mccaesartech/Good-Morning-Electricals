@@ -13,7 +13,10 @@ const TITLES: Record<string, { title: string; subtitle: string }> = {
   '/hero': { title: 'Hero Section', subtitle: 'Edit homepage hero content' },
   '/settings': { title: 'Site Settings', subtitle: 'Global site configuration' },
   '/contact': { title: 'Contact Info', subtitle: 'Phone, email, and location' },
-  '/activity': { title: 'Activity Log', subtitle: 'Admin audit trail' }
+  '/activity': { title: 'Activity Log', subtitle: 'Admin audit trail' },
+  '/enquiries': { title: 'Enquiries', subtitle: 'Contact form submissions' },
+  '/enrolments': { title: 'Enrolments', subtitle: 'Online applications' },
+  '/users': { title: 'User Management', subtitle: 'Admin accounts and roles' }
 };
 
 export default function TopbarTitle() {

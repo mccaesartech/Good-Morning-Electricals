@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth';
+import { hasPermission } from '@/lib/permissions';
 import PageHeader from '@/components/ui/PageHeader';
+import StatCard from '@/components/dashboard/StatCard';
+import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
 
 async function getCount(table: string) {
   const supabase = await createClient();
@@ -8,104 +12,95 @@ async function getCount(table: string) {
   return count ?? 0;
 }
 
-async function getRecentActivity() {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from('activity_log')
-    .select('summary, action, entity, created_at, user_email')
-    .order('created_at', { ascending: false })
-    .limit(6);
-  return data ?? [];
-}
-
-const QUICK_LINKS = [
-  { href: '/programmes', label: 'Programmes' },
-  { href: '/staff', label: 'Staff' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/settings', label: 'Site Settings' }
-];
-
 export default async function DashboardPage() {
-  const [programmes, staff, gallery, testimonials, faq, activity] = await Promise.all([
-    getCount('programmes'),
-    getCount('staff'),
-    getCount('gallery'),
-    getCount('testimonials'),
-    getCount('faq'),
-    getRecentActivity()
-  ]);
+  const supabase = await createClient();
+  const profile = await requireAdmin(supabase);
+  if (!profile) return null;
+
+  const [programmes, staff, gallery, testimonials, faq, enquiries, enrolments] =
+    await Promise.all([
+      getCount('programmes'),
+      getCount('staff'),
+      getCount('gallery'),
+      getCount('testimonials'),
+      getCount('faq'),
+      getCount('contact_enquiries'),
+      getCount('enrolments')
+    ]);
+
+  const perms = profile.permissions;
 
   return (
     <>
+      <WelcomeBanner profile={profile} />
+
       <PageHeader
         title="Dashboard"
-        description="Manage your academy website content. Changes sync to Supabase instantly."
+        description="Overview of your academy website and incoming applications."
       />
 
       <div className="dash-stats">
-        <div className="dash-card">
-          <div className="dash-card__icon gold">🎓</div>
-          <div><strong>{programmes}</strong><span>Programmes</span></div>
-        </div>
-        <div className="dash-card">
-          <div className="dash-card__icon blue">👥</div>
-          <div><strong>{staff}</strong><span>Staff</span></div>
-        </div>
-        <div className="dash-card">
-          <div className="dash-card__icon green">🖼️</div>
-          <div><strong>{gallery}</strong><span>Gallery Photos</span></div>
-        </div>
-        <div className="dash-card">
-          <div className="dash-card__icon purple">💬</div>
-          <div><strong>{testimonials}</strong><span>Testimonials</span></div>
-        </div>
-        <div className="dash-card">
-          <div className="dash-card__icon gold">❓</div>
-          <div><strong>{faq}</strong><span>FAQ Items</span></div>
-        </div>
+        {hasPermission(perms, 'manage_programmes') && (
+          <StatCard href="/programmes" count={programmes} label="Programmes" icon="🎓" variant="gold" />
+        )}
+        {hasPermission(perms, 'manage_staff') && (
+          <StatCard href="/staff" count={staff} label="Staff" icon="👥" variant="blue" />
+        )}
+        {hasPermission(perms, 'manage_gallery') && (
+          <StatCard href="/gallery" count={gallery} label="Gallery Photos" icon="🖼️" variant="green" />
+        )}
+        {hasPermission(perms, 'manage_testimonials') && (
+          <StatCard href="/testimonials" count={testimonials} label="Testimonials" icon="💬" variant="purple" />
+        )}
+        {hasPermission(perms, 'manage_faq') && (
+          <StatCard href="/faq" count={faq} label="FAQ Items" icon="❓" variant="gold" />
+        )}
+        {hasPermission(perms, ['view_enquiries', 'manage_enquiries']) && (
+          <StatCard href="/enquiries" count={enquiries} label="Enquiries" icon="📩" variant="blue" />
+        )}
+        {hasPermission(perms, ['view_enrolments', 'manage_enrolments']) && (
+          <StatCard href="/enrolments" count={enrolments} label="Enrolments" icon="📋" variant="green" />
+        )}
       </div>
 
       <div className="grid-2">
         <div className="card">
           <h3>Quick Actions</h3>
           <div className="quick-links">
-            {QUICK_LINKS.map((link) => (
-              <Link key={link.href} href={link.href} className="btn btn-secondary btn-sm">
-                {link.label}
-              </Link>
-            ))}
+            {hasPermission(perms, 'manage_programmes') && (
+              <Link href="/programmes" className="btn btn-secondary btn-sm">Programmes</Link>
+            )}
+            {hasPermission(perms, ['view_enquiries', 'manage_enquiries']) && (
+              <Link href="/enquiries" className="btn btn-secondary btn-sm">View Enquiries</Link>
+            )}
+            {hasPermission(perms, ['view_enrolments', 'manage_enrolments']) && (
+              <Link href="/enrolments" className="btn btn-secondary btn-sm">View Enrolments</Link>
+            )}
+            {hasPermission(perms, 'manage_settings') && (
+              <Link href="/settings" className="btn btn-secondary btn-sm">Site Settings</Link>
+            )}
           </div>
         </div>
         <div className="card">
-          <h3>Publishing</h3>
+          <h3>Workflow</h3>
           <ol>
-            <li>Edit content in any section below.</li>
-            <li>Set status to <strong>Published</strong> when ready.</li>
-            <li>The public website loads published content automatically.</li>
+            <li>Visitors submit enquiries and enrolments on the public site.</li>
+            <li>Applicants receive an automatic confirmation email.</li>
+            <li>Review submissions under <strong>Enquiries</strong> or <strong>Enrolments</strong>.</li>
+            <li>Publish content changes when ready for the live website.</li>
           </ol>
         </div>
       </div>
 
-      <div className="card">
-        <h3>Recent Activity</h3>
-        {activity.length === 0 ? (
-          <p>No activity logged yet.</p>
-        ) : (
-          <ul className="activity-list">
-            {activity.map((item, i) => (
-              <li key={i}>
-                <strong>{item.action}</strong> — {item.summary || item.entity}
-                {item.user_email ? ` (${item.user_email})` : ''}
-                <br />
-                <small>{new Date(item.created_at).toLocaleString()}</small>
-              </li>
-            ))}
-          </ul>
-        )}
-        <Link href="/activity" className="btn btn-ghost-dark btn-sm" style={{ marginTop: '1rem' }}>
-          View full activity log →
-        </Link>
-      </div>
+      {hasPermission(perms, ['view_activity', 'manage_users']) && (
+        <div className="card">
+          <h3>Audit Trail</h3>
+          <p>All admin actions are recorded in the Activity Log for compliance and review.</p>
+          <Link href="/activity" className="btn btn-ghost-dark btn-sm" style={{ marginTop: '0.75rem' }}>
+            Open Activity Log →
+          </Link>
+        </div>
+      )}
     </>
   );
 }

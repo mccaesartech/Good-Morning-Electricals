@@ -85,4 +85,12 @@ for (const [from] of OPTIONAL_COPIES) {
   copyFromAdmin(from, true);
 }
 
+const clientModule = path.join(root, 'lib', 'supabase', 'client.ts');
+if (!fs.existsSync(clientModule)) {
+  throw new Error(
+    `Supabase client module missing after copy (expected at ${clientModule}). ` +
+    'Ensure admin/lib/supabase is not excluded by .vercelignore.'
+  );
+}
+
 console.log('Prepared Next.js app at repository root for Vercel build.');

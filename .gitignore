@@ -8,7 +8,7 @@ node_modules/
 .next/
 app/
 components/
-lib/
+/lib/
 public/
 middleware.ts
 next-env.d.ts

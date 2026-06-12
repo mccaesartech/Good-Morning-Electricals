@@ -5,6 +5,12 @@
   "buildCommand": "npm run build",
   "headers": [
     {
+      "source": "/",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
       "source": "/js/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
@@ -24,7 +30,11 @@
     }
   ],
   "redirects": [
+    { "source": "/index.html", "destination": "/", "permanent": true },
     { "source": "/login", "destination": "/admin/login", "permanent": false },
     { "source": "/login/:path*", "destination": "/admin/login/:path*", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" }
   ]
 }

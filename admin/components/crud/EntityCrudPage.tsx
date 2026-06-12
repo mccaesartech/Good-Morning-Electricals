@@ -146,9 +146,9 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
 
       if (payload.status === 'published') {
         notifyContentPublished();
-        toast.success('Content saved successfully');
+        toast.success('Published — refresh the live site to see changes');
       } else {
-        toast.success('Content saved successfully (draft — not visible on website)');
+        toast.success('Saved as draft — not visible on the live website until published');
       }
     } else {
       const { data, error: insertError } = await supabase
@@ -169,9 +169,9 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
 
       if (payload.status === 'published') {
         notifyContentPublished();
-        toast.success(`${config.labelSingular} created successfully`);
+        toast.success('Published — refresh the live site to see changes');
       } else {
-        toast.success(`${config.labelSingular} created (draft — not visible on website)`);
+        toast.success('Saved as draft — not visible on the live website until published');
       }
     }
 

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { readTextNormalized, writeUtf8 } from './normalize-js-encoding.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -34,6 +35,10 @@ function copyRecursive(src, dest) {
     return;
   }
   fs.mkdirSync(path.dirname(dest), { recursive: true });
+  if (src.endsWith('.js')) {
+    writeUtf8(dest, readTextNormalized(src));
+    return;
+  }
   fs.copyFileSync(src, dest);
 }
 
@@ -106,7 +111,12 @@ function copyStaticSite() {
     if (!fs.existsSync(src)) {
       throw new Error(`Static site file missing: ${file} (expected at ${src})`);
     }
-    fs.copyFileSync(src, path.join(publicDir, file));
+    const dest = path.join(publicDir, file);
+    if (file.endsWith('.js')) {
+      writeUtf8(dest, readTextNormalized(src));
+    } else {
+      fs.copyFileSync(src, dest);
+    }
   }
 
   for (const dir of STATIC_SITE_DIRS) {

@@ -2,7 +2,7 @@
   "name": "good-morning-electricals",
   "private": true,
   "scripts": {
-    "build": "node scripts/prepare-vercel-build.mjs && next build",
+    "build": "node scripts/normalize-js-encoding.mjs && node scripts/prepare-vercel-build.mjs && next build",
     "vercel-build": "npm run build"
   },
   "dependencies": {

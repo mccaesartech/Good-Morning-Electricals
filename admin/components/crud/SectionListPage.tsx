@@ -12,7 +12,7 @@ const SECTION_FIELDS: SingletonField[] = [
 ];
 
 type SectionListPageProps = {
-  sectionTable: 'facilities_section' | 'gallery_section';
+  sectionTable: 'facilities_section' | 'staff_section' | 'gallery_section';
   sectionTitle: string;
   sectionDescription: string;
   listConfig: EntityConfig;
@@ -30,6 +30,10 @@ export default function SectionListPage({
 }: SectionListPageProps) {
   return (
     <div className="section-list-page">
+      <p className="section-list-page__hint">
+        Section text only appears on the live site after <strong>Save &amp; Publish</strong>.
+        Photos and profiles below must have <strong>Status: Published</strong> before they show on the website.
+      </p>
       <SingletonEditor
         table={sectionTable}
         title={sectionTitle}

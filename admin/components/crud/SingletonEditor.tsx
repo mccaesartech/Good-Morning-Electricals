@@ -105,7 +105,7 @@ export default function SingletonEditor({
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  async function saveRecord(publish: boolean) {
+  async function saveRecord() {
     if (saving) return;
 
     setSaving(true);
@@ -131,19 +131,20 @@ export default function SingletonEditor({
       }
     }
 
-    if (publish) {
-      payload.status = 'published';
-      payload.published_at = new Date().toISOString();
-    } else {
-      payload.status = 'draft';
-      payload.published_at = null;
-    }
+    payload.status = 'published';
+    payload.published_at = new Date().toISOString();
 
     const supabase = createClient();
     let savedId = recordId;
 
     if (recordId) {
-      const { error: updateError } = await supabase.from(table).update(payload).eq('id', recordId);
+      const { data: updated, error: updateError } = await supabase
+        .from(table)
+        .update(payload)
+        .eq('id', recordId)
+        .select('id')
+        .maybeSingle();
+
       if (updateError) {
         const msg = friendlyError(updateError.message, 'Failed to save content');
         setError(msg);
@@ -151,44 +152,53 @@ export default function SingletonEditor({
         setSaving(false);
         return;
       }
+
+      if (!updated) {
+        const msg = 'Save failed — check you are logged in and have permission to edit this content.';
+        setError(msg);
+        toast.error(msg);
+        setSaving(false);
+        return;
+      }
+
       await logActivity('updated', table, `Updated ${entityLabel}`, recordId);
     } else {
       const { data: inserted, error: insertError } = await supabase
         .from(table)
         .insert(payload)
         .select('id')
-        .single();
-      if (insertError || !inserted) {
-        const msg = friendlyError(insertError?.message ?? 'Insert failed', 'Failed to save content');
+        .maybeSingle();
+
+      if (insertError) {
+        const msg = friendlyError(insertError.message, 'Failed to save content');
         setError(msg);
         toast.error(msg);
         setSaving(false);
         return;
       }
+
+      if (!inserted) {
+        const msg = 'Create failed — check you are logged in and have permission to add this content.';
+        setError(msg);
+        toast.error(msg);
+        setSaving(false);
+        return;
+      }
+
       savedId = inserted.id as string;
       setRecordId(savedId);
       await logActivity('created', table, `Created ${entityLabel}`, savedId);
     }
 
-    if (publish) {
-      notifyContentPublished();
-      toast.success('Published — open the live site to see your changes');
-      await load();
-    } else {
-      toast.success('Saved as draft — not visible on the live website until published');
-    }
-
+    notifyContentPublished();
+    toast.success('Published — changes are live on the website');
+    await load();
     setSaving(false);
   }
 
   async function handlePublish(e: React.FormEvent) {
     e.preventDefault();
-    await saveRecord(true);
-  }
-
-  async function handleSaveDraft(e: React.FormEvent) {
-    e.preventDefault();
-    await saveRecord(false);
+    await saveRecord();
   }
 
   function renderField(field: SingletonField) {

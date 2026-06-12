@@ -7,8 +7,7 @@ import type { EntityConfig } from '@/lib/entity-config';
 const SECTION_FIELDS: SingletonField[] = [
   { name: 'section_label', label: 'Section Label', type: 'text', col: 'half', placeholder: 'Our Campus' },
   { name: 'title', label: 'Section Title', type: 'text', col: 'full' },
-  { name: 'description', label: 'Section Description', type: 'textarea', rows: 2, col: 'full' },
-  { name: 'status', label: 'Status', type: 'select', col: 'half' }
+  { name: 'description', label: 'Section Description', type: 'textarea', rows: 2, col: 'full' }
 ];
 
 type SectionListPageProps = {
@@ -31,8 +30,8 @@ export default function SectionListPage({
   return (
     <div className="section-list-page">
       <p className="section-list-page__hint">
-        Section text only appears on the live site after <strong>Save &amp; Publish</strong>.
-        Photos and profiles below must have <strong>Status: Published</strong> before they show on the website.
+        Click <strong>Save &amp; Publish</strong> for section headings. Each photo or staff member is published
+        automatically when you click <strong>Save &amp; Publish</strong> in the edit form below.
       </p>
       <SingletonEditor
         table={sectionTable}

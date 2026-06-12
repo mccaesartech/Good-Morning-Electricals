@@ -13,6 +13,15 @@ Run these **in order** in the Supabase SQL Editor after migrations `001`–`009`
 | 16 | `20250611000016_rls_policies.sql` | RLS for new tables |
 | 17 | `20250611000017_grants.sql` | Execute grants |
 | 18 | `20250611000018_migrate_editor_users.sql` | `editor` → `content_manager` |
+| 19 | `20250611000019_content_manager_settings_contact.sql` | Contact + settings perms |
+| 20 | `20250611000020_contact_map_and_notifications.sql` | Map coordinates |
+| 21 | `20250611000021_staff_gallery_permissions.sql` | Staff/gallery perms |
+| 22 | `20250611000022_facilities_gallery_sections.sql` | Gallery section singleton + RPC |
+| 23 | `20250611000023_staff_section.sql` | Staff section singleton + RPC |
+| 24 | `20250611000024_publish_draft_content.sql` | Publish draft rows |
+| 25 | `20250611000025_ensure_rpc_grant.sql` | RPC execute grant |
+
+**Quick path:** paste `supabase/RUN_MIGRATIONS_019_TO_024.sql` in SQL Editor if 019–024 were skipped.
 
 ## After SQL
 

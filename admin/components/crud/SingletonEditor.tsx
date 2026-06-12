@@ -172,7 +172,8 @@ export default function SingletonEditor({
 
     if (publish) {
       notifyContentPublished();
-      toast.success('Published — open the live site (or refresh) to see changes');
+      toast.success('Published — open the live site to see your changes');
+      await load();
     } else {
       toast.success('Saved as draft — not visible on the live website until published');
     }
@@ -265,14 +266,7 @@ export default function SingletonEditor({
             <button type="submit" className="btn btn-primary" disabled={saving}>
               {saving ? 'Publishing…' : 'Save & Publish'}
             </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              disabled={saving}
-              onClick={handleSaveDraft}
-            >
-              {saving ? 'Saving…' : 'Save as Draft'}
-            </button>
+            <p className="field-hint">Changes go live on the public website immediately after publishing.</p>
           </div>
         </form>
       )}

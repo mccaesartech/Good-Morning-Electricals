@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { logActivity } from '@/lib/activity';
 import { friendlyError } from '@/lib/errors';
 import { notifyContentPublished } from '@/lib/notify';
-import { STATUS_OPTIONS } from '@/lib/constants';
+import { publicSiteUrl } from '@/lib/constants';
 import {
   type EntityConfig,
   deserializeFieldValue,
@@ -115,6 +115,7 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
 
     const payload: Record<string, unknown> = {};
     for (const field of config.fields) {
+      if (field.name === 'status') continue;
       payload[field.name] = serializeFieldValue(field, form[field.name]);
     }
 
@@ -122,17 +123,18 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
       payload.slug = slugify(String(payload.title));
     }
 
-    if (payload.status === 'published') {
-      payload.published_at = new Date().toISOString();
-    }
+    payload.status = 'published';
+    payload.published_at = new Date().toISOString();
 
     const supabase = createClient();
 
     if (editing) {
-      const { error: updateError } = await supabase
+      const { data: updated, error: updateError } = await supabase
         .from(config.table)
         .update(payload)
-        .eq('id', editing.id);
+        .eq('id', editing.id)
+        .select('id')
+        .maybeSingle();
 
       if (updateError) {
         const msg = friendlyError(updateError.message, 'Failed to save content');
@@ -142,14 +144,18 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
         return;
       }
 
+      if (!updated) {
+        const msg = 'Save failed — check you are logged in and have permission to edit this content.';
+        setError(msg);
+        toast.error(msg);
+        setSaving(false);
+        return;
+      }
+
       await logActivity('updated', config.table, `Updated ${config.labelSingular}: ${payload.title ?? payload.full_name ?? payload.caption ?? payload.question ?? editing.id}`, editing.id);
 
-      if (payload.status === 'published') {
-        notifyContentPublished();
-        toast.success('Published — refresh the live site to see changes');
-      } else {
-        toast.success('Saved as draft — not visible on the live website until published');
-      }
+      notifyContentPublished();
+      toast.success('Published — open the live site to see your changes');
     } else {
       const { data, error: insertError } = await supabase
         .from(config.table)
@@ -167,12 +173,8 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
 
       await logActivity('created', config.table, `Created ${config.labelSingular}: ${payload.title ?? payload.full_name ?? payload.caption ?? payload.question ?? data.id}`, data.id);
 
-      if (payload.status === 'published') {
-        notifyContentPublished();
-        toast.success('Published — refresh the live site to see changes');
-      } else {
-        toast.success('Saved as draft — not visible on the live website until published');
-      }
+      notifyContentPublished();
+      toast.success('Published — open the live site to see your changes');
     }
 
     setSaving(false);
@@ -248,6 +250,8 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
     await load();
   }
 
+  const formFields = config.fields.filter((field) => field.name !== 'status');
+
   function renderField(field: (typeof config.fields)[number]) {
     const value = form[field.name] ?? '';
 
@@ -260,22 +264,6 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
           folder={field.imageFolder ?? config.imageFolder ?? 'gallery'}
           onChange={(url) => setField(field.name, url)}
         />
-      );
-    }
-
-    if (field.type === 'select') {
-      return (
-        <div key={field.name} className={`form-field${field.col === 'half' ? ' form-field--half' : ''}`}>
-          <label>{field.label}</label>
-          <select
-            value={String(value)}
-            onChange={(e) => setField(field.name, e.target.value)}
-          >
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </div>
       );
     }
 
@@ -388,14 +376,25 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
         wide
       >
         <form onSubmit={handleSave}>
-          <div className="form-grid">{config.fields.map(renderField)}</div>
+          <p className="field-hint" style={{ marginBottom: '1rem' }}>
+            Saving always publishes to the live website. Use <strong>Unpublish</strong> in the table to hide an item.
+          </p>
+          <div className="form-grid">{formFields.map(renderField)}</div>
           <div className="modal__actions">
             <button type="button" className="btn btn-secondary" onClick={closeModal} disabled={saving}>
               Cancel
             </button>
             <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'Saving…' : editing ? 'Save Changes' : 'Create'}
+              {saving ? 'Publishing…' : 'Save & Publish'}
             </button>
+            <a
+              href={publicSiteUrl(true)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-ghost-dark"
+            >
+              View Live Site
+            </a>
           </div>
         </form>
       </Modal>

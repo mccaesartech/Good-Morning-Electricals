@@ -389,15 +389,15 @@
     }
 
     var testimonialsGrid = document.getElementById('testimonials-grid');
-    if (testimonialsGrid && data.testimonials.length) {
-      testimonialsGrid.innerHTML = data.testimonials.map(function (t) {
+    if (testimonialsGrid) {
+      testimonialsGrid.innerHTML = data.testimonials.length ? data.testimonials.map(function (t) {
         var stars = '';
         for (var si = 0; si < (t.stars || 5); si++) stars += '<i class="fas fa-star" aria-hidden="true"></i>';
         return '<blockquote class="testimonial-card reveal"><div class="testimonial-card__stars" aria-label="' + (t.stars || 5) + ' out of 5 stars">' + stars + '</div>' +
           '<p class="testimonial-card__text">&ldquo;' + esc(t.text) + '&rdquo;</p>' +
           '<footer class="testimonial-card__author"><div class="testimonial-card__avatar">' + esc(t.initials) + '</div>' +
           '<div><cite class="testimonial-card__name">' + esc(t.name) + '</cite><span class="testimonial-card__programme">' + esc(t.programme) + '</span></div></footer></blockquote>';
-      }).join('');
+      ).join('') : '';;
     }
 
     var staffGrid = document.getElementById('staff-grid');
@@ -447,11 +447,11 @@
     }
 
     var faqList = document.getElementById('faq-list');
-    if (faqList && data.faq.length) {
-      faqList.innerHTML = data.faq.map(function (f) {
+    if (faqList) {
+      faqList.innerHTML = data.faq.length ? data.faq.map(function (f) {
         return '<details class="faq-item reveal"><summary class="faq-item__question"><span>' + esc(f.question) + '</span><i class="fas fa-plus faq-item__icon" aria-hidden="true"></i></summary>' +
           '<div class="faq-item__answer"><p>' + esc(f.answer) + '</p></div></details>';
-      }).join('');
+      ).join('') : '';;
     }
 
     var loc = data.location;
@@ -545,9 +545,6 @@
   document.addEventListener('DOMContentLoaded', function () {
     if (!window.GME_Supabase) return;
 
-    var forceRefresh = /[?&]refresh=1(?:&|$)/.test(window.location.search);
-    if (forceRefresh) GME_Supabase.clearCache();
-
     GME_Supabase.loadSiteContent({ force: true })
       .then(function (raw) {
         var data = normalize(raw);
@@ -577,16 +574,18 @@
     }
 
     document.addEventListener('visibilitychange', function () {
-      if (!document.hidden) {
-        onContentPublished();
-      }
+      if (!document.hidden) onContentPublished();
+    });
+
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) onContentPublished();
     });
 
     setInterval(function () {
       if (!document.hidden) {
         onContentPublished();
       }
-    }, 45000);
+    }, 10000);
   });
 
   window.GME_render = render;

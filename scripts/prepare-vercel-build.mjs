@@ -106,13 +106,22 @@ function copyStaticSite() {
   const publicDir = path.join(root, 'public');
   fs.mkdirSync(publicDir, { recursive: true });
 
+  const assetVersion = String(Date.now());
+
   for (const file of STATIC_SITE_FILES) {
     const src = path.join(root, file);
     if (!fs.existsSync(src)) {
       throw new Error(`Static site file missing: ${file} (expected at ${src})`);
     }
     const dest = path.join(publicDir, file);
-    if (file.endsWith('.js')) {
+    if (file === 'index.html') {
+      let html = readTextNormalized(src);
+      html = html.replace(
+        /(<script src="(?:js\/[^"]+\.js|script\.js))(">)/g,
+        `$1?v=${assetVersion}$2`
+      );
+      writeUtf8(dest, html);
+    } else if (file.endsWith('.js')) {
       writeUtf8(dest, readTextNormalized(src));
     } else {
       fs.copyFileSync(src, dest);

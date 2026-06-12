@@ -1,10 +1,7 @@
 (function () {
   'use strict';
 
-  var CACHE_KEY = 'gme_site_content_v1';
   var VERSION_KEY = 'gme_content_version';
-  /** Short TTL — admin publishes should appear quickly on refresh */
-  var CACHE_TTL_MS = 3000;
 
   function getContentVersion() {
     try {
@@ -25,43 +22,13 @@
     return { url: url, anonKey: anonKey };
   }
 
-  function readCache() {
-    try {
-      var raw = sessionStorage.getItem(CACHE_KEY);
-      if (!raw) return null;
-      var parsed = JSON.parse(raw);
-      if (!parsed.data || !parsed.ts) return null;
-      if (parsed.version !== getContentVersion()) {
-        sessionStorage.removeItem(CACHE_KEY);
-        return null;
-      }
-      if (Date.now() - parsed.ts > CACHE_TTL_MS) {
-        sessionStorage.removeItem(CACHE_KEY);
-        return null;
-      }
-      return parsed.data;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function writeCache(data) {
-    try {
-      sessionStorage.setItem(CACHE_KEY, JSON.stringify({
-        ts: Date.now(),
-        version: getContentVersion(),
-        data: data
-      }));
-    } catch (e) { /* ignore */ }
-  }
-
   function fetchPublishedContent() {
     var cfg = getConfig();
     if (!cfg.url || !cfg.anonKey) {
       return Promise.reject(new Error('Supabase not configured'));
     }
     var endpoint = cfg.url.replace(/\/$/, '') + '/rest/v1/rpc/get_published_site_content';
-    return fetch(endpoint + '?_=' + Date.now(), {
+    return fetch(endpoint + '?_=' + Date.now() + '&v=' + encodeURIComponent(getContentVersion()), {
       method: 'POST',
       cache: 'no-store',
       headers: {
@@ -80,19 +47,14 @@
   }
 
   function loadSiteContent(options) {
-    var force = options && options.force;
+    var force = !options || options.force !== false;
     if (!force) {
-      var cached = readCache();
-      if (cached) return Promise.resolve(cached);
+      return fetchPublishedContent();
     }
-    return fetchPublishedContent().then(function (data) {
-      writeCache(data);
-      return data;
-    });
+    return fetchPublishedContent();
   }
 
   function refreshSiteContent() {
-    sessionStorage.removeItem(CACHE_KEY);
     return loadSiteContent({ force: true }).then(function (data) {
       if (window.GME_render && window.GME_normalize) {
         var normalized = window.GME_normalize(data);
@@ -106,8 +68,6 @@
     getConfig: getConfig,
     loadSiteContent: loadSiteContent,
     refreshSiteContent: refreshSiteContent,
-    clearCache: function () {
-      sessionStorage.removeItem(CACHE_KEY);
-    }
+    clearCache: function () { /* no-op — cache removed for live sync */ }
   };
 })();

@@ -286,20 +286,20 @@ address { font-style: normal; }
 .nav__logo-img,
 .footer__logo-img,
 .site-logo {
-  width: 56px;
+  width: auto;
   height: 56px;
+  max-width: 72px;
   object-fit: contain;
+  object-position: center;
   flex-shrink: 0;
   background: transparent;
   border: none;
   padding: 0;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
-  mix-blend-mode: lighten;
 }
 
 .footer__logo-img {
-  mix-blend-mode: normal;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+  height: 52px;
+  max-width: 68px;
 }
 
 .footer__logo {

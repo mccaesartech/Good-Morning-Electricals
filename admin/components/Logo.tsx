@@ -24,7 +24,7 @@ export default function Logo({
       width={width}
       height={height}
       className={className}
-      style={style}
+      style={{ objectFit: 'contain', ...style }}
     />
   );
 }

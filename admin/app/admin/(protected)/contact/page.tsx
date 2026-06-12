@@ -4,7 +4,9 @@ const FIELDS = [
   { name: 'email', label: 'Email', type: 'text' as const, col: 'half' as const },
   { name: 'whatsapp', label: 'WhatsApp', type: 'text' as const, col: 'half' as const },
   { name: 'address', label: 'Address', type: 'textarea' as const, rows: 2, col: 'full' as const },
-  { name: 'gps_code', label: 'GPS Code', type: 'text' as const, col: 'half' as const },
+  { name: 'gps_code', label: 'GPS / Map Label', type: 'text' as const, col: 'half' as const, placeholder: '5.6602529, -0.0391007' },
+  { name: 'map_latitude', label: 'Map Latitude', type: 'text' as const, col: 'half' as const, placeholder: '5.6602529' },
+  { name: 'map_longitude', label: 'Map Longitude', type: 'text' as const, col: 'half' as const, placeholder: '-0.0391007' },
   { name: 'office_hours', label: 'Office Hours', type: 'text' as const, col: 'half' as const },
   { name: 'phones', label: 'Phone Numbers (one per line)', type: 'lines' as const, col: 'full' as const },
   { name: 'status', label: 'Status', type: 'select' as const, col: 'half' as const }

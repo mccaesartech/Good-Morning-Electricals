@@ -133,6 +133,21 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
     <>
       <PageHeader title={config.title} description={config.description} />
 
+      <div className="card" style={{ marginBottom: '1rem' }}>
+        {type === 'enrolments' ? (
+          <p className="field-hint" style={{ margin: 0 }}>
+            <strong>How enrolment works:</strong> New applications arrive as <strong>Pending</strong> (received successfully).
+            Use <strong>Mark Contacted</strong> after you call or email the applicant, then <strong>Mark Admitted</strong> when accepted.
+            Applicants receive an automatic confirmation email/SMS when they submit (if notifications are configured).
+          </p>
+        ) : (
+          <p className="field-hint" style={{ margin: 0 }}>
+            <strong>Enquiries:</strong> New messages start as <strong>New</strong>. Mark <strong>Contacted</strong> once you have replied.
+            Applicants receive a confirmation email when they submit (if notifications are configured).
+          </p>
+        )}
+      </div>
+
       <div className="filter-bar card">
         <div className="form-field form-field--half">
           <label>Status</label>

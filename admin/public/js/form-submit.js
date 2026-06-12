@@ -40,6 +40,21 @@
     });
   }
 
+  function sendNotification(table, record) {
+    var cfg = getConfig();
+    if (!cfg.url || !cfg.anonKey) return Promise.resolve();
+    var endpoint = cfg.url.replace(/\/$/, '') + '/functions/v1/send-notification';
+    return fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        apikey: cfg.anonKey,
+        Authorization: 'Bearer ' + cfg.anonKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ table: table, record: record })
+    }).catch(function () { /* non-blocking */ });
+  }
+
   function setLoading(form, loading) {
     var btn = form.querySelector('button[type="submit"]');
     if (btn) {
@@ -49,15 +64,16 @@
     }
   }
 
-  function showSuccess(form) {
+  function showSuccess(form, message) {
     var el = form.querySelector('.form-success');
     if (el) {
       el.hidden = false;
-      el.textContent = 'Thank you! Your submission was received. We will contact you shortly.';
+      el.textContent = message;
     }
     var err = form.querySelector('.form-error-global');
     if (err) err.remove();
     form.reset();
+    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function showError(form, msg) {
@@ -69,6 +85,8 @@
       form.prepend(el);
     }
     el.textContent = msg;
+    var ok = form.querySelector('.form-success');
+    if (ok) ok.hidden = true;
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -78,14 +96,26 @@
         e.preventDefault();
         if (!contactForm.checkValidity()) { contactForm.reportValidity(); return; }
         setLoading(contactForm, true);
+        var record = {
+          full_name: contactForm.querySelector('[name="name"]').value.trim(),
+          email: contactForm.querySelector('[name="email"]').value.trim(),
+          phone: contactForm.querySelector('[name="phone"]').value.trim() || null,
+          programme: contactForm.querySelector('[name="programme"]').value.trim() || null,
+          message: contactForm.querySelector('[name="message"]').value.trim()
+        };
         callRpc('submit_contact_enquiry', {
-          p_full_name: contactForm.querySelector('[name="name"]').value.trim(),
-          p_email: contactForm.querySelector('[name="email"]').value.trim(),
-          p_phone: contactForm.querySelector('[name="phone"]').value.trim() || null,
-          p_programme: contactForm.querySelector('[name="programme"]').value.trim() || null,
-          p_message: contactForm.querySelector('[name="message"]').value.trim()
+          p_full_name: record.full_name,
+          p_email: record.email,
+          p_phone: record.phone,
+          p_programme: record.programme,
+          p_message: record.message
         }).then(function () {
-          showSuccess(contactForm);
+          return sendNotification('contact_enquiries', record);
+        }).then(function () {
+          showSuccess(
+            contactForm,
+            'Thank you! Your message was received successfully. We will contact you by phone or email shortly.'
+          );
         }).catch(function (err) {
           showError(contactForm, err.message || 'Please try again.');
         }).finally(function () {
@@ -101,16 +131,30 @@
         if (!enrolForm.checkValidity()) { enrolForm.reportValidity(); return; }
         setLoading(enrolForm, true);
         var dob = enrolForm.querySelector('[name="date_of_birth"]').value;
+        var record = {
+          full_name: enrolForm.querySelector('[name="full_name"]').value.trim(),
+          email: enrolForm.querySelector('[name="email"]').value.trim(),
+          phone: enrolForm.querySelector('[name="phone"]').value.trim(),
+          programme: enrolForm.querySelector('[name="programme"]').value.trim(),
+          date_of_birth: dob || null,
+          education_level: enrolForm.querySelector('[name="education_level"]').value.trim() || null,
+          message: enrolForm.querySelector('[name="message"]').value.trim() || null
+        };
         callRpc('submit_enrolment', {
-          p_full_name: enrolForm.querySelector('[name="full_name"]').value.trim(),
-          p_email: enrolForm.querySelector('[name="email"]').value.trim(),
-          p_phone: enrolForm.querySelector('[name="phone"]').value.trim(),
-          p_programme: enrolForm.querySelector('[name="programme"]').value.trim(),
-          p_date_of_birth: dob || null,
-          p_education_level: enrolForm.querySelector('[name="education_level"]').value.trim() || null,
-          p_message: enrolForm.querySelector('[name="message"]').value.trim() || null
+          p_full_name: record.full_name,
+          p_email: record.email,
+          p_phone: record.phone,
+          p_programme: record.programme,
+          p_date_of_birth: record.date_of_birth,
+          p_education_level: record.education_level,
+          p_message: record.message
         }).then(function () {
-          showSuccess(enrolForm);
+          return sendNotification('enrolments', record);
+        }).then(function () {
+          showSuccess(
+            enrolForm,
+            'Application submitted successfully! A confirmation email and SMS will be sent to you shortly. Our admissions team will review your application (status: Pending) and contact you soon.'
+          );
         }).catch(function (err) {
           showError(enrolForm, err.message || 'Please try again.');
         }).finally(function () {

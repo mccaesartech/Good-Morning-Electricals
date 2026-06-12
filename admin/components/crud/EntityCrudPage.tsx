@@ -104,8 +104,11 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
     setError('');
 
     for (const field of config.fields) {
+      if (field.name === 'status') continue;
       if (field.required && !form[field.name]) {
-        const msg = `${field.label} is required.`;
+        const msg = field.type === 'image'
+          ? `${field.label} is required — upload a photo or paste an image URL.`
+          : `${field.label} is required.`;
         setError(msg);
         toast.error(msg);
         setSaving(false);
@@ -161,10 +164,18 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
         .from(config.table)
         .insert(payload)
         .select('id')
-        .single();
+        .maybeSingle();
 
       if (insertError) {
         const msg = friendlyError(insertError.message, 'Failed to save content');
+        setError(msg);
+        toast.error(msg);
+        setSaving(false);
+        return;
+      }
+
+      if (!data) {
+        const msg = 'Create failed — check you are logged in and have permission to add this content.';
         setError(msg);
         toast.error(msg);
         setSaving(false);

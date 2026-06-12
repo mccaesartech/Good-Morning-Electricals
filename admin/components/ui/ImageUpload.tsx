@@ -31,7 +31,7 @@ export default function ImageUpload({ label, value, folder, onChange }: ImageUpl
       toast.error(msg);
     } else {
       onChange(result.url);
-      toast.success('Image uploaded successfully');
+      toast.success('Image uploaded — click Save & Publish to show on the live website');
     }
 
     setUploading(false);

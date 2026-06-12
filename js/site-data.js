@@ -173,13 +173,25 @@
     return 'tel:+233' + String(phone).replace(/^0/, '').replace(/\s/g, '');
   }
 
+  function cacheBustUrl(src) {
+    if (!src || src.indexOf('http') !== 0) return src;
+    var sep = src.indexOf('?') >= 0 ? '&' : '?';
+    var version = '0';
+    try {
+      version = localStorage.getItem('gme_content_version') || String(Date.now());
+    } catch (e) {
+      version = String(Date.now());
+    }
+    return src + sep + 'v=' + encodeURIComponent(version);
+  }
+
   function setImageSrc(el, src) {
     if (!el || !src) return;
     if (src.indexOf('assets/logo') !== -1 || src === 'assets/logo.png') {
       el.src = 'assets/logo.png';
       return;
     }
-    el.src = src;
+    el.src = cacheBustUrl(src);
   }
 
   function mapQuery(loc) {
@@ -327,7 +339,7 @@
     if (programmesGrid) {
       programmesGrid.innerHTML = data.programmes.length
         ? data.programmes.map(function (p) {
-        return '<article class="programme-card reveal"><div class="programme-card__image"><img src="' + esc(p.image || FALLBACK_IMAGE) + '" alt="' + esc(p.title) + '" loading="lazy">' +
+        return '<article class="programme-card reveal visible"><div class="programme-card__image"><img src="' + esc(cacheBustUrl(p.image || FALLBACK_IMAGE)) + '" alt="' + esc(p.title) + '" loading="lazy">' +
           (p.badge ? '<span class="programme-card__badge">' + esc(p.badge) + '</span>' : '') +
           '</div><div class="programme-card__body"><div class="programme-card__icon"><i class="fas ' + esc(faIcon(p.icon)) + '" aria-hidden="true"></i></div>' +
           '<h3 class="programme-card__title">' + esc(p.title) + '</h3><p class="programme-card__desc">' + esc(p.desc) + '</p>' +
@@ -362,7 +374,7 @@
     if (facilitiesGrid) {
       facilitiesGrid.innerHTML = data.facilities.length
         ? data.facilities.map(function (f) {
-        return '<article class="facility-card reveal"><div class="facility-card__image"><img src="' + esc(f.image || FALLBACK_IMAGE) + '" alt="' + esc(f.title) + '" loading="lazy"></div>' +
+        return '<article class="facility-card reveal visible"><div class="facility-card__image"><img src="' + esc(cacheBustUrl(f.image || FALLBACK_IMAGE)) + '" alt="' + esc(f.title) + '" loading="lazy"></div>' +
           '<div class="facility-card__content"><div class="facility-card__icon"><i class="fas ' + esc(faIcon(f.icon)) + '" aria-hidden="true"></i></div>' +
           '<h3>' + esc(f.title) + '</h3><p>' + esc(f.text) + '</p></div></article>';
       }).join('')
@@ -371,9 +383,11 @@
 
     var timeline = document.getElementById('journey-timeline');
     if (timeline) {
+      timeline.setAttribute('data-count', String(data.journey.length));
+      timeline.classList.toggle('timeline--compact', data.journey.length >= 6);
       timeline.innerHTML = data.journey.length
         ? data.journey.map(function (j) {
-        return '<div class="timeline__item reveal"><div class="timeline__marker"><i class="fas ' + esc(faIcon(j.icon)) + '" aria-hidden="true"></i></div>' +
+        return '<div class="timeline__item reveal visible"><div class="timeline__marker"><i class="fas ' + esc(faIcon(j.icon)) + '" aria-hidden="true"></i></div>' +
           '<div class="timeline__content"><span class="timeline__step">' + esc(j.step) + '</span><h3>' + esc(j.title) + '</h3><p>' + esc(j.text) + '</p></div></div>';
       }).join('')
         : '';
@@ -393,19 +407,19 @@
       testimonialsGrid.innerHTML = data.testimonials.length ? data.testimonials.map(function (t) {
         var stars = '';
         for (var si = 0; si < (t.stars || 5); si++) stars += '<i class="fas fa-star" aria-hidden="true"></i>';
-        return '<blockquote class="testimonial-card reveal"><div class="testimonial-card__stars" aria-label="' + (t.stars || 5) + ' out of 5 stars">' + stars + '</div>' +
+        return '<blockquote class="testimonial-card reveal visible"><div class="testimonial-card__stars" aria-label="' + (t.stars || 5) + ' out of 5 stars">' + stars + '</div>' +
           '<p class="testimonial-card__text">&ldquo;' + esc(t.text) + '&rdquo;</p>' +
           '<footer class="testimonial-card__author"><div class="testimonial-card__avatar">' + esc(t.initials) + '</div>' +
           '<div><cite class="testimonial-card__name">' + esc(t.name) + '</cite><span class="testimonial-card__programme">' + esc(t.programme) + '</span></div></footer></blockquote>';
-      ).join('') : '';;
+      }).join('') : '';
     }
 
     var staffGrid = document.getElementById('staff-grid');
     if (staffGrid) {
       staffGrid.innerHTML = data.staff.length
         ? data.staff.map(function (st) {
-          return '<article class="staff-card reveal">' +
-            (st.image ? '<div class="staff-card__image"><img src="' + esc(st.image) + '" alt="' + esc(st.name) + '" loading="lazy"></div>' :
+          return '<article class="staff-card reveal visible">' +
+            (st.image ? '<div class="staff-card__image"><img src="' + esc(cacheBustUrl(st.image)) + '" alt="' + esc(st.name) + '" loading="lazy"></div>' :
               '<div class="staff-card__avatar">' + esc(st.initials || st.name.charAt(0)) + '</div>') +
             '<h3 class="staff-card__name">' + esc(st.name) + '</h3><p class="staff-card__role">' + esc(st.role) + '</p>' +
             (st.qualifications ? '<p class="staff-card__qual">' + esc(st.qualifications) + '</p>' : '') +
@@ -419,7 +433,7 @@
     if (galleryGrid) {
       galleryGrid.innerHTML = data.gallery.length
         ? data.gallery.map(function (g) {
-          return '<figure class="gallery-item reveal"><img src="' + esc(g.image || FALLBACK_IMAGE) + '" alt="' + esc(g.alt || g.title) + '" loading="lazy"><figcaption>' + esc(g.title) + '</figcaption></figure>';
+          return '<figure class="gallery-item reveal visible"><img src="' + esc(cacheBustUrl(g.image || FALLBACK_IMAGE)) + '" alt="' + esc(g.alt || g.title) + '" loading="lazy"><figcaption>' + esc(g.title) + '</figcaption></figure>';
         }).join('')
         : '';
     }
@@ -449,9 +463,9 @@
     var faqList = document.getElementById('faq-list');
     if (faqList) {
       faqList.innerHTML = data.faq.length ? data.faq.map(function (f) {
-        return '<details class="faq-item reveal"><summary class="faq-item__question"><span>' + esc(f.question) + '</span><i class="fas fa-plus faq-item__icon" aria-hidden="true"></i></summary>' +
+        return '<details class="faq-item reveal visible"><summary class="faq-item__question"><span>' + esc(f.question) + '</span><i class="fas fa-plus faq-item__icon" aria-hidden="true"></i></summary>' +
           '<div class="faq-item__answer"><p>' + esc(f.answer) + '</p></div></details>';
-      ).join('') : '';;
+      }).join('') : '';
     }
 
     var loc = data.location;

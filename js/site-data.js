@@ -556,7 +556,7 @@
     if (window.GME_initStats) window.GME_initStats();
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  function bootSiteContent() {
     if (!window.GME_Supabase) return;
 
     GME_Supabase.loadSiteContent({ force: true })
@@ -600,7 +600,13 @@
         onContentPublished();
       }
     }, 5000);
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootSiteContent);
+  } else {
+    bootSiteContent();
+  }
 
   window.GME_render = render;
   window.GME_normalize = normalize;

@@ -30,11 +30,7 @@
     }
   ],
   "redirects": [
-    { "source": "/index.html", "destination": "/", "permanent": true },
     { "source": "/login", "destination": "/admin/login", "permanent": false },
     { "source": "/login/:path*", "destination": "/admin/login/:path*", "permanent": false }
-  ],
-  "rewrites": [
-    { "source": "/", "destination": "/index.html" }
   ]
 }

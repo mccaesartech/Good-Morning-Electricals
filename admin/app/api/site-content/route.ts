@@ -5,12 +5,12 @@ export const revalidate = 0;
 
 /** Public endpoint: returns published CMS content for the marketing site. */
 export async function GET() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !anonKey) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
-  }
+  const url = (
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qjvglzudiriajoyoclhe.supabase.co'
+  ).replace(/\/$/, '');
+  const anonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    'sb_publishable_X1SAkKLhFmFZUc8N5Qzf5w_zzZGySd9';
 
   const res = await fetch(`${url}/rest/v1/rpc/get_published_site_content`, {
     method: 'POST',

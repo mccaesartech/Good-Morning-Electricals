@@ -31,19 +31,6 @@
     return res.json();
   }
 
-  function fetchFromApi() {
-    var version = encodeURIComponent(getContentVersion());
-    return fetch('/api/site-content?_=' + Date.now() + '&v=' + version, {
-      method: 'GET',
-      cache: 'no-store',
-      headers: {
-        Accept: 'application/json',
-        'Cache-Control': 'no-cache, no-store',
-        Pragma: 'no-cache'
-      }
-    }).then(parseJsonResponse);
-  }
-
   function fetchFromSupabaseRpc() {
     var cfg = getConfig();
     if (!cfg.url || !cfg.anonKey) {
@@ -65,9 +52,22 @@
     }).then(parseJsonResponse);
   }
 
+  function fetchFromApi() {
+    var version = encodeURIComponent(getContentVersion());
+    return fetch('/api/site-content?_=' + Date.now() + '&v=' + version, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: {
+        Accept: 'application/json',
+        'Cache-Control': 'no-cache, no-store',
+        Pragma: 'no-cache'
+      }
+    }).then(parseJsonResponse);
+  }
+
   function fetchPublishedContent() {
-    return fetchFromApi().catch(function () {
-      return fetchFromSupabaseRpc();
+    return fetchFromSupabaseRpc().catch(function () {
+      return fetchFromApi();
     });
   }
 

@@ -5,6 +5,8 @@ import Alert from '@/components/ui/Alert';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import Modal from '@/components/ui/Modal';
 import PageHeader from '@/components/ui/PageHeader';
+import { useToast } from '@/components/ui/ToastProvider';
+import { friendlyError } from '@/lib/errors';
 import {
   PERMISSIONS,
   ROLE_LABELS,
@@ -26,10 +28,10 @@ type AdminUser = {
 const ROLES: AdminRole[] = ['superadmin', 'content_manager', 'staff_manager', 'viewer'];
 
 export default function UsersManager() {
+  const toast = useToast();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<AdminUser | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
@@ -88,6 +90,7 @@ export default function UsersManager() {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    if (saving) return;
     setSaving(true);
     setError('');
 
@@ -103,8 +106,14 @@ export default function UsersManager() {
         })
       });
       const json = await res.json();
-      if (!res.ok) setError(json.error ?? 'Update failed');
-      else { setSuccess('User updated.'); ok = true; }
+      if (!res.ok) {
+        const msg = friendlyError(json.error ?? 'Update failed', 'Failed to save content');
+        setError(msg);
+        toast.error(msg);
+      } else {
+        toast.success('User updated successfully');
+        ok = true;
+      }
     } else {
       const res = await fetch('/admin/api/users', {
         method: 'POST',
@@ -118,8 +127,14 @@ export default function UsersManager() {
         })
       });
       const json = await res.json();
-      if (!res.ok) setError(json.error ?? 'Create failed');
-      else { setSuccess('User created.'); ok = true; }
+      if (!res.ok) {
+        const msg = friendlyError(json.error ?? 'Create failed', 'Failed to save content');
+        setError(msg);
+        toast.error(msg);
+      } else {
+        toast.success('User created successfully');
+        ok = true;
+      }
     }
 
     setSaving(false);
@@ -136,9 +151,12 @@ export default function UsersManager() {
       body: JSON.stringify({ active: !user.active })
     });
     const json = await res.json();
-    if (!res.ok) setError(json.error);
-    else {
-      setSuccess(user.active ? 'User deactivated.' : 'User activated.');
+    if (!res.ok) {
+      const msg = friendlyError(json.error, 'Failed to update user');
+      setError(msg);
+      toast.error(msg);
+    } else {
+      toast.success(user.active ? 'User deactivated successfully' : 'User activated successfully');
       await load();
     }
   }
@@ -150,18 +168,26 @@ export default function UsersManager() {
       body: JSON.stringify({})
     });
     const json = await res.json();
-    if (!res.ok) setError(json.error);
-    else setSuccess(`Password reset email sent to ${user.email}.`);
+    if (!res.ok) {
+      const msg = friendlyError(json.error, 'Failed to send reset email');
+      setError(msg);
+      toast.error(msg);
+    } else {
+      toast.success(`Password reset email sent to ${user.email}`);
+    }
   }
 
   async function handleDelete() {
-    if (!deleteTarget) return;
+    if (!deleteTarget || saving) return;
     setSaving(true);
     const res = await fetch(`/admin/api/users/${deleteTarget.id}`, { method: 'DELETE' });
     const json = await res.json();
-    if (!res.ok) setError(json.error);
-    else {
-      setSuccess('User deleted.');
+    if (!res.ok) {
+      const msg = friendlyError(json.error, 'Failed to delete user');
+      setError(msg);
+      toast.error(msg);
+    } else {
+      toast.success('User deleted successfully');
       setDeleteTarget(null);
       await load();
     }
@@ -177,7 +203,6 @@ export default function UsersManager() {
       />
 
       <Alert type="error" message={error} onDismiss={() => setError('')} />
-      <Alert type="success" message={success} onDismiss={() => setSuccess('')} />
 
       {loading ? (
         <div className="loading-state"><div className="spinner" /><p>Loading users…</p></div>

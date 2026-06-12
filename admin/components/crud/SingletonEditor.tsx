@@ -3,18 +3,22 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { logActivity } from '@/lib/activity';
+import { friendlyError } from '@/lib/errors';
+import { notifyContentPublished } from '@/lib/notify';
 import { STATUS_OPTIONS } from '@/lib/constants';
 import Alert from '@/components/ui/Alert';
 import PageHeader from '@/components/ui/PageHeader';
 import ImageUpload from '@/components/ui/ImageUpload';
+import { useToast } from '@/components/ui/ToastProvider';
 
 export type SingletonField = {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'image' | 'lines' | 'json-lines';
+  type: 'text' | 'textarea' | 'select' | 'image' | 'lines' | 'json-lines' | 'json';
   rows?: number;
   imageFolder?: string;
   col?: 'full' | 'half';
+  placeholder?: string;
 };
 
 type SingletonEditorProps = {
@@ -34,6 +38,21 @@ function linesToString(value: unknown): string {
   return value.map(String).join('\n');
 }
 
+function jsonToString(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return '';
+  }
+}
+
+function parseJsonField(value: string): unknown {
+  const trimmed = value.trim();
+  if (!trimmed) return [];
+  return JSON.parse(trimmed);
+}
+
 export default function SingletonEditor({
   table,
   title,
@@ -41,12 +60,12 @@ export default function SingletonEditor({
   fields,
   entityLabel
 }: SingletonEditorProps) {
+  const toast = useToast();
   const [recordId, setRecordId] = useState<string | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -67,6 +86,8 @@ export default function SingletonEditor({
         const val = data[field.name];
         if (field.type === 'lines' || field.type === 'json-lines') {
           initial[field.name] = linesToString(val);
+        } else if (field.type === 'json') {
+          initial[field.name] = jsonToString(val);
         } else {
           initial[field.name] = val === null || val === undefined ? '' : String(val);
         }
@@ -84,45 +105,78 @@ export default function SingletonEditor({
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function saveRecord(publish: boolean) {
     if (!recordId) {
-      setError('No record found in database.');
+      const msg = 'No record found in database.';
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
+    if (saving) return;
+
     setSaving(true);
     setError('');
-    setSuccess('');
 
     const payload: Record<string, unknown> = {};
     for (const field of fields) {
       const raw = form[field.name] ?? '';
-      if (field.type === 'lines') {
+      if (field.type === 'lines' || field.type === 'json-lines') {
         payload[field.name] = parseLines(raw);
-      } else if (field.type === 'json-lines') {
-        payload[field.name] = parseLines(raw);
+      } else if (field.type === 'json') {
+        try {
+          payload[field.name] = parseJsonField(raw);
+        } catch {
+          const msg = `Invalid JSON in ${field.label}.`;
+          setError(msg);
+          toast.error(msg);
+          setSaving(false);
+          return;
+        }
       } else {
         payload[field.name] = raw;
       }
     }
 
-    if (payload.status === 'published') {
+    if (publish) {
+      payload.status = 'published';
       payload.published_at = new Date().toISOString();
+    } else {
+      payload.status = 'draft';
+      payload.published_at = null;
     }
 
     const supabase = createClient();
     const { error: updateError } = await supabase.from(table).update(payload).eq('id', recordId);
 
     if (updateError) {
-      setError(updateError.message);
+      const msg = friendlyError(updateError.message, 'Failed to save content');
+      setError(msg);
+      toast.error(msg);
       setSaving(false);
       return;
     }
 
     await logActivity('updated', table, `Updated ${entityLabel}`, recordId);
-    setSuccess(`${entityLabel} saved successfully.`);
+
+    if (publish) {
+      notifyContentPublished();
+      toast.success('Changes published successfully');
+    } else {
+      toast.success('Content saved successfully (draft — not visible on website)');
+    }
+
     setSaving(false);
+  }
+
+  async function handlePublish(e: React.FormEvent) {
+    e.preventDefault();
+    await saveRecord(true);
+  }
+
+  async function handleSaveDraft(e: React.FormEvent) {
+    e.preventDefault();
+    await saveRecord(false);
   }
 
   function renderField(field: SingletonField) {
@@ -147,19 +201,24 @@ export default function SingletonEditor({
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
+          <p className="field-hint">Published content appears on the live website.</p>
         </div>
       );
     }
 
-    if (field.type === 'textarea' || field.type === 'lines' || field.type === 'json-lines') {
+    if (field.type === 'textarea' || field.type === 'lines' || field.type === 'json-lines' || field.type === 'json') {
       return (
         <div key={field.name} className={`form-field${field.col === 'half' ? ' form-field--half' : ''}`}>
           <label>{field.label}</label>
           <textarea
-            rows={field.rows ?? 3}
+            rows={field.rows ?? (field.type === 'json' ? 6 : 3)}
             value={form[field.name] ?? ''}
+            placeholder={field.placeholder}
             onChange={(e) => setField(field.name, e.target.value)}
           />
+          {field.type === 'json' && (
+            <p className="field-hint">JSON array format, e.g. [{`{"number":"500+","label":"Students","count":500}`}]</p>
+          )}
         </div>
       );
     }
@@ -170,6 +229,7 @@ export default function SingletonEditor({
         <input
           type="text"
           value={form[field.name] ?? ''}
+          placeholder={field.placeholder}
           onChange={(e) => setField(field.name, e.target.value)}
         />
       </div>
@@ -181,7 +241,6 @@ export default function SingletonEditor({
       <PageHeader title={title} description={description} />
 
       <Alert type="error" message={error} onDismiss={() => setError('')} />
-      <Alert type="success" message={success} onDismiss={() => setSuccess('')} />
 
       {loading ? (
         <div className="loading-state">
@@ -189,11 +248,19 @@ export default function SingletonEditor({
           <p>Loading…</p>
         </div>
       ) : (
-        <form className="card singleton-form" onSubmit={handleSubmit}>
+        <form className="card singleton-form" onSubmit={handlePublish}>
           <div className="form-grid">{fields.map(renderField)}</div>
           <div className="form-actions">
             <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'Saving…' : 'Save Changes'}
+              {saving ? 'Publishing…' : 'Save & Publish'}
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              disabled={saving}
+              onClick={handleSaveDraft}
+            >
+              {saving ? 'Saving…' : 'Save as Draft'}
             </button>
           </div>
         </form>

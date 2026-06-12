@@ -1,2 +1,6 @@
-admin/node_modules
-admin/.next
+admin
+admin.html
+admin.css
+admin.js
+backup-phase1
+supabase

@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { logActivity } from '@/lib/activity';
+import { friendlyError } from '@/lib/errors';
+import { notifyContentPublished } from '@/lib/notify';
 import { STATUS_OPTIONS } from '@/lib/constants';
 import {
   type EntityConfig,
@@ -15,6 +17,7 @@ import Modal from '@/components/ui/Modal';
 import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
 import ImageUpload from '@/components/ui/ImageUpload';
+import { useToast } from '@/components/ui/ToastProvider';
 
 type Row = Record<string, unknown> & { id: string };
 
@@ -31,11 +34,11 @@ function slugify(text: string): string {
 }
 
 export default function EntityCrudPage({ config, description }: EntityCrudPageProps) {
+  const toast = useToast();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
   const [form, setForm] = useState<Record<string, unknown>>({});
@@ -52,7 +55,9 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
       .order('sort_order', { ascending: true });
 
     if (fetchError) {
-      setError(fetchError.message);
+      const msg = friendlyError(fetchError.message, 'Failed to load content');
+      setError(msg);
+      toast.error(msg);
       setRows([]);
     } else {
       setRows((data as Row[]) ?? []);
@@ -66,10 +71,9 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
 
   function openCreate() {
     setEditing(null);
-    setForm({ ...(config.defaultValues ?? {}), status: 'draft' });
+    setForm({ ...(config.defaultValues ?? {}), status: 'published' });
     setModalOpen(true);
     setError('');
-    setSuccess('');
   }
 
   function openEdit(row: Row) {
@@ -94,13 +98,16 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    if (saving) return;
+
     setSaving(true);
     setError('');
-    setSuccess('');
 
     for (const field of config.fields) {
       if (field.required && !form[field.name]) {
-        setError(`${field.label} is required.`);
+        const msg = `${field.label} is required.`;
+        setError(msg);
+        toast.error(msg);
         setSaving(false);
         return;
       }
@@ -128,13 +135,21 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
         .eq('id', editing.id);
 
       if (updateError) {
-        setError(updateError.message);
+        const msg = friendlyError(updateError.message, 'Failed to save content');
+        setError(msg);
+        toast.error(msg);
         setSaving(false);
         return;
       }
 
       await logActivity('updated', config.table, `Updated ${config.labelSingular}: ${payload.title ?? payload.full_name ?? payload.caption ?? payload.question ?? editing.id}`, editing.id);
-      setSuccess(`${config.labelSingular} updated successfully.`);
+
+      if (payload.status === 'published') {
+        notifyContentPublished();
+        toast.success('Content saved successfully');
+      } else {
+        toast.success('Content saved successfully (draft — not visible on website)');
+      }
     } else {
       const { data, error: insertError } = await supabase
         .from(config.table)
@@ -143,13 +158,21 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
         .single();
 
       if (insertError) {
-        setError(insertError.message);
+        const msg = friendlyError(insertError.message, 'Failed to save content');
+        setError(msg);
+        toast.error(msg);
         setSaving(false);
         return;
       }
 
       await logActivity('created', config.table, `Created ${config.labelSingular}: ${payload.title ?? payload.full_name ?? payload.caption ?? payload.question ?? data.id}`, data.id);
-      setSuccess(`${config.labelSingular} created successfully.`);
+
+      if (payload.status === 'published') {
+        notifyContentPublished();
+        toast.success(`${config.labelSingular} created successfully`);
+      } else {
+        toast.success(`${config.labelSingular} created (draft — not visible on website)`);
+      }
     }
 
     setSaving(false);
@@ -158,7 +181,7 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
   }
 
   async function handleDelete() {
-    if (!deleteTarget) return;
+    if (!deleteTarget || deleting) return;
     setDeleting(true);
     setError('');
 
@@ -169,7 +192,9 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
       .eq('id', deleteTarget.id);
 
     if (deleteError) {
-      setError(deleteError.message);
+      const msg = friendlyError(deleteError.message, 'Failed to delete content');
+      setError(msg);
+      toast.error(msg);
       setDeleting(false);
       return;
     }
@@ -179,7 +204,8 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
     );
     await logActivity('deleted', config.table, `Deleted ${config.labelSingular}: ${label}`, deleteTarget.id);
 
-    setSuccess(`${config.labelSingular} deleted.`);
+    notifyContentPublished();
+    toast.success(`${config.labelSingular} deleted successfully`);
     setDeleteTarget(null);
     setDeleting(false);
     await load();
@@ -197,7 +223,9 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
       .eq('id', row.id);
 
     if (updateError) {
-      setError(updateError.message);
+      const msg = friendlyError(updateError.message, 'Failed to publish content');
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -209,7 +237,14 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
       row.id
     );
 
-    setSuccess(`${config.labelSingular} ${newStatus === 'published' ? 'published' : 'unpublished'}.`);
+    if (newStatus === 'published') {
+      notifyContentPublished();
+      toast.success('Changes published successfully');
+    } else {
+      notifyContentPublished();
+      toast.success(`${config.labelSingular} unpublished`);
+    }
+
     await load();
   }
 
@@ -263,9 +298,9 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
         <label>{field.label}{field.required && ' *'}</label>
         <input
           type={field.type === 'number' ? 'number' : 'text'}
-          value={field.type === 'number' ? String(value) : String(value)}
+          value={String(value)}
           placeholder={field.placeholder}
-          onChange={(e) => setField(field.name, field.type === 'number' ? e.target.value : e.target.value)}
+          onChange={(e) => setField(field.name, e.target.value)}
         />
       </div>
     );
@@ -284,7 +319,6 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
       />
 
       <Alert type="error" message={error} onDismiss={() => setError('')} />
-      <Alert type="success" message={success} onDismiss={() => setSuccess('')} />
 
       {loading ? (
         <div className="loading-state">

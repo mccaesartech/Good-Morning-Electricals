@@ -76,7 +76,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { name: 'careers', label: 'Career Paths (one per line)', type: 'lines', col: 'full' },
       { name: 'status', label: 'Status', type: 'select', col: 'half' }
     ],
-    defaultValues: { icon: 'fa-plug', sort_order: 0, status: 'draft', careers: [] }
+    defaultValues: { icon: 'fa-plug', sort_order: 0, status: 'published', careers: [] }
   },
   staff: {
     table: 'staff',
@@ -99,7 +99,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { name: 'photo_url', label: 'Photo', type: 'image', imageFolder: 'staff', col: 'full' },
       { name: 'status', label: 'Status', type: 'select', col: 'half' }
     ],
-    defaultValues: { sort_order: 0, status: 'draft' }
+    defaultValues: { sort_order: 0, status: 'published' }
   },
   gallery: {
     table: 'gallery',
@@ -118,7 +118,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { name: 'sort_order', label: 'Sort Order', type: 'number', col: 'half' },
       { name: 'status', label: 'Status', type: 'select', col: 'half' }
     ],
-    defaultValues: { sort_order: 0, status: 'draft', image_url: '' }
+    defaultValues: { sort_order: 0, status: 'published', image_url: '' }
   },
   testimonials: {
     table: 'testimonials',
@@ -139,7 +139,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { name: 'sort_order', label: 'Sort Order', type: 'number', col: 'half' },
       { name: 'status', label: 'Status', type: 'select', col: 'half' }
     ],
-    defaultValues: { stars: 5, sort_order: 0, status: 'draft' }
+    defaultValues: { stars: 5, sort_order: 0, status: 'published' }
   },
   faq: {
     table: 'faq',
@@ -156,7 +156,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { name: 'sort_order', label: 'Sort Order', type: 'number', col: 'half' },
       { name: 'status', label: 'Status', type: 'select', col: 'half' }
     ],
-    defaultValues: { sort_order: 0, status: 'draft' }
+    defaultValues: { sort_order: 0, status: 'published' }
   },
   facilities: {
     table: 'facilities',
@@ -176,6 +176,62 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { name: 'image_url', label: 'Image', type: 'image', imageFolder: 'facilities', col: 'full' },
       { name: 'status', label: 'Status', type: 'select', col: 'half' }
     ],
-    defaultValues: { icon: 'fa-toolbox', sort_order: 0, status: 'draft' }
+    defaultValues: { icon: 'fa-toolbox', sort_order: 0, status: 'published' }
+  },
+  features: {
+    table: 'features',
+    label: 'Why Choose Us',
+    labelSingular: 'Feature',
+    columns: [
+      { key: 'title', label: 'Title' },
+      { key: 'sort_order', label: 'Order' },
+      { key: 'status', label: 'Status' }
+    ],
+    fields: [
+      { name: 'title', label: 'Title', type: 'text', required: true, col: 'full' },
+      { name: 'icon', label: 'Icon (Font Awesome class)', type: 'text', placeholder: 'fa-star', col: 'half' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', col: 'half' },
+      { name: 'body', label: 'Description', type: 'textarea', required: true, rows: 3, col: 'full' },
+      { name: 'status', label: 'Status', type: 'select', col: 'half' }
+    ],
+    defaultValues: { icon: 'fa-star', sort_order: 0, status: 'published' }
+  },
+  journey: {
+    table: 'journey',
+    label: 'Student Journey',
+    labelSingular: 'Journey Step',
+    columns: [
+      { key: 'step_label', label: 'Step' },
+      { key: 'title', label: 'Title' },
+      { key: 'sort_order', label: 'Order' },
+      { key: 'status', label: 'Status' }
+    ],
+    fields: [
+      { name: 'step_label', label: 'Step Label', type: 'text', required: true, placeholder: 'Step 1', col: 'half' },
+      { name: 'icon', label: 'Icon (Font Awesome class)', type: 'text', placeholder: 'fa-user-plus', col: 'half' },
+      { name: 'title', label: 'Title', type: 'text', required: true, col: 'full' },
+      { name: 'body', label: 'Description', type: 'textarea', required: true, rows: 3, col: 'full' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', col: 'half' },
+      { name: 'status', label: 'Status', type: 'select', col: 'half' }
+    ],
+    defaultValues: { icon: 'fa-circle', sort_order: 0, status: 'published' }
+  },
+  careers: {
+    table: 'careers',
+    label: 'Career Paths',
+    labelSingular: 'Career Path',
+    columns: [
+      { key: 'title', label: 'Title' },
+      { key: 'sort_order', label: 'Order' },
+      { key: 'status', label: 'Status' }
+    ],
+    fields: [
+      { name: 'title', label: 'Title', type: 'text', required: true, col: 'full' },
+      { name: 'icon', label: 'Icon (Font Awesome class)', type: 'text', placeholder: 'fa-bolt', col: 'half' },
+      { name: 'sort_order', label: 'Sort Order', type: 'number', col: 'half' },
+      { name: 'body', label: 'Description', type: 'textarea', required: true, rows: 3, col: 'full' },
+      { name: 'status', label: 'Status', type: 'select', col: 'half' }
+    ],
+    defaultValues: { icon: 'fa-bolt', sort_order: 0, status: 'published' }
   }
 };

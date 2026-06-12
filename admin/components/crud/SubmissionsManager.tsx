@@ -8,6 +8,8 @@ import { canManage } from '@/lib/permissions';
 import Alert from '@/components/ui/Alert';
 import PageHeader from '@/components/ui/PageHeader';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useToast } from '@/components/ui/ToastProvider';
+import { friendlyError } from '@/lib/errors';
 
 type SubmissionType = 'enquiries' | 'enrolments';
 
@@ -56,11 +58,11 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
   const config = CONFIGS[type];
   const profile = useProfile();
   const canEdit = canManage(profile.permissions, config.managePermission);
+  const toast = useToast();
 
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selected, setSelected] = useState<Row | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Row | null>(null);
@@ -85,7 +87,7 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
   useEffect(() => { load(); }, [load]);
 
   async function updateStatus(id: string, status: string) {
-    if (!canEdit) return;
+    if (!canEdit || saving) return;
     setSaving(true);
     setError('');
     const supabase = createClient();
@@ -95,9 +97,11 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
 
     const { error: updateError } = await supabase.from(config.table).update(payload).eq('id', id);
     if (updateError) {
-      setError(updateError.message);
+      const msg = friendlyError(updateError.message, 'Failed to save content');
+      setError(msg);
+      toast.error(msg);
     } else {
-      setSuccess(`Status updated to ${status}.`);
+      toast.success('Content saved successfully');
       await logActivity('updated', config.table, `Updated ${config.entityLabel} status to ${status}`, id);
       setSelected(null);
       await load();
@@ -106,15 +110,17 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
   }
 
   async function handleDelete() {
-    if (!deleteTarget || !canEdit) return;
+    if (!deleteTarget || !canEdit || saving) return;
     setSaving(true);
     const supabase = createClient();
     const { error: deleteError } = await supabase.from(config.table).delete().eq('id', deleteTarget.id);
     if (deleteError) {
-      setError(deleteError.message);
+      const msg = friendlyError(deleteError.message, 'Failed to delete content');
+      setError(msg);
+      toast.error(msg);
     } else {
       await logActivity('deleted', config.table, `Deleted ${config.entityLabel}`, deleteTarget.id);
-      setSuccess('Entry removed.');
+      toast.success('Entry deleted successfully');
       setDeleteTarget(null);
       setSelected(null);
       await load();
@@ -141,7 +147,6 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
       </div>
 
       <Alert type="error" message={error} onDismiss={() => setError('')} />
-      <Alert type="success" message={success} onDismiss={() => setSuccess('')} />
 
       {loading ? (
         <div className="loading-state"><div className="spinner" /><p>Loading…</p></div>

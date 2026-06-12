@@ -1106,8 +1106,16 @@ address { font-style: normal; }
   line-height: 1.6;
 }
 
-/* Student Journey — compact card grid */
-.journey { background: var(--primary); color: var(--white); }
+/* Student Journey — compact timeline */
+.journey {
+  background: var(--primary);
+  color: var(--white);
+  padding: clamp(3rem, 6vw, 5rem) 0;
+}
+
+.journey .section__header {
+  margin-bottom: clamp(1.5rem, 3.5vw, 2.25rem);
+}
 
 .journey .section__label {
   background: rgba(244, 180, 0, 0.2);
@@ -1117,118 +1125,86 @@ address { font-style: normal; }
 .journey .section__title { color: var(--white); }
 .journey .section__desc { color: rgba(255, 255, 255, 0.7); }
 
-.journey-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-@media (min-width: 640px) {
-  .journey-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (min-width: 1024px) {
-  .journey-grid { grid-template-columns: repeat(5, 1fr); gap: 0.875rem; }
-}
-
-.journey-card {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-md);
-  padding: 1.25rem 1rem;
-  text-align: center;
-  transition: transform 0.2s, border-color 0.2s;
-}
-
-.journey-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(244, 180, 0, 0.45);
-}
-
-.journey-card__icon {
-  width: 44px;
-  height: 44px;
-  margin: 0 auto 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--secondary);
-  color: var(--primary-dark);
-  border-radius: 50%;
-  font-size: 1rem;
-}
-
-.journey-card__step {
-  display: block;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--secondary);
-  margin-bottom: 0.35rem;
-}
-
-.journey-card h3 {
-  font-family: var(--font-heading);
-  font-size: 1.0625rem;
-  font-weight: 700;
-  margin-bottom: 0.4rem;
-}
-
-.journey-card p {
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.75);
-  margin: 0;
-}
-
-/* Legacy timeline (unused) */
 .timeline {
   position: relative;
-  max-width: 700px;
+  max-width: 920px;
   margin: 0 auto;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
 }
 
 .timeline::before {
   content: '';
   position: absolute;
-  left: 24px;
-  top: 0;
-  bottom: 0;
+  left: calc(clamp(1.25rem, 2.5vw, 1.75rem) + 21px);
+  top: clamp(1.25rem, 2.5vw, 1.75rem);
+  bottom: clamp(1.25rem, 2.5vw, 1.75rem);
   width: 2px;
-  background: rgba(244, 180, 0, 0.3);
+  background: linear-gradient(
+    180deg,
+    rgba(201, 162, 39, 0.2) 0%,
+    rgba(201, 162, 39, 0.5) 50%,
+    rgba(201, 162, 39, 0.2) 100%
+  );
+  border-radius: 1px;
+  pointer-events: none;
 }
 
 .timeline__item {
   position: relative;
-  padding-left: 72px;
-  padding-bottom: 2.5rem;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 0.75rem 0.875rem;
+  align-items: start;
+  padding-bottom: 1rem;
 }
 
-.timeline__item:last-child { padding-bottom: 0; }
+.timeline__item:last-child {
+  padding-bottom: 0;
+}
 
 .timeline__marker {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 50px;
-  height: 50px;
+  position: relative;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--secondary);
   color: var(--primary-dark);
   border-radius: 50%;
-  font-size: 1.125rem;
-  z-index: 1;
-  box-shadow: 0 0 0 4px var(--primary);
+  font-size: 0.9375rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  box-shadow: 0 0 0 3px var(--primary);
+  transition: transform 0.2s ease;
+}
+
+.timeline__item:hover .timeline__marker {
+  transform: scale(1.05);
+}
+
+.timeline__content {
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 0.875rem 1rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  transition: border-color 0.2s ease;
+}
+
+.timeline__item:hover .timeline__content {
+  border-color: rgba(201, 162, 39, 0.35);
 }
 
 .timeline__step {
   display: inline-block;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -1236,24 +1212,101 @@ address { font-style: normal; }
   margin-bottom: 0.25rem;
 }
 
-.timeline__content {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-md);
-  padding: 1.25rem 1.5rem;
-}
-
 .timeline__content h3 {
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 2vw, 1.125rem);
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
+  line-height: 1.3;
 }
 
 .timeline__content p {
-  font-size: 0.9375rem;
-  opacity: 0.8;
-  line-height: 1.65;
+  font-size: clamp(0.8125rem, 1.6vw, 0.875rem);
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Tablet — slightly wider cards, still single column */
+@media (min-width: 640px) {
+  .timeline {
+    padding: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .timeline::before {
+    left: calc(clamp(1.5rem, 3vw, 2rem) + 21px);
+    top: clamp(1.5rem, 3vw, 2rem);
+    bottom: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .timeline__item {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 0.75rem 1rem;
+    padding-bottom: 1.125rem;
+  }
+
+  .timeline__marker {
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
+  }
+
+  .timeline__content {
+    padding: 1rem 1.125rem;
+  }
+}
+
+/* Desktop — alternating layout with tight center alignment */
+@media (min-width: 900px) {
+  .timeline {
+    max-width: 960px;
+    padding: 1.75rem 1.5rem;
+  }
+
+  .timeline::before {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 1.75rem;
+    bottom: 1.75rem;
+  }
+
+  .timeline__item {
+    grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+    gap: 0 1.125rem;
+    align-items: center;
+    padding-bottom: 1rem;
+  }
+
+  .timeline__marker {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+    margin-top: 0;
+  }
+
+  .timeline__content {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: start;
+    width: 100%;
+  }
+
+  .timeline__item:nth-child(odd) .timeline__content {
+    grid-column: 1;
+    justify-self: end;
+    text-align: right;
+  }
+
+  .timeline__item:nth-child(odd) .timeline__step,
+  .timeline__item:nth-child(odd) h3 {
+    text-align: right;
+  }
+
+  .timeline__item:nth-child(even) .timeline__content {
+    grid-column: 3;
+    justify-self: start;
+    text-align: left;
+  }
 }
 
 /* Careers */
@@ -2179,24 +2232,4 @@ address { font-style: normal; }
     max-width: none;
     margin: 0;
   }
-  .timeline::before { left: 50%; transform: translateX(-50%); }
-  .timeline__item {
-    padding-left: 0;
-    padding-right: 0;
-    width: 50%;
-  }
-  .timeline__item:nth-child(odd) {
-    padding-right: calc(50% + 40px);
-    text-align: right;
-  }
-  .timeline__item:nth-child(even) {
-    margin-left: 50%;
-    padding-left: calc(50% + 40px);
-  }
-  .timeline__marker {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .timeline__item:nth-child(odd) .timeline__marker { left: auto; right: -25px; transform: none; }
-  .timeline__item:nth-child(even) .timeline__marker { left: -25px; transform: none; }
 }

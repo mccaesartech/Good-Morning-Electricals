@@ -6,8 +6,8 @@ const PUBLIC_PATHS = ['/login', '/auth/callback'];
 
 const PROTECTED_PREFIXES = [
   '/dashboard', '/programmes', '/staff', '/gallery', '/testimonials', '/faq',
-  '/facilities', '/hero', '/settings', '/contact', '/activity',
-  '/enquiries', '/enrolments', '/users'
+  '/facilities', '/hero', '/about', '/features', '/admissions', '/journey', '/careers',
+  '/settings', '/contact', '/activity', '/enquiries', '/enrolments', '/users'
 ];
 
 function routePermission(path: string): Permission | Permission[] | 'any' | null {
@@ -70,6 +70,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*', '/programmes/:path*', '/staff/:path*', '/gallery/:path*',
     '/testimonials/:path*', '/faq/:path*', '/facilities/:path*', '/hero/:path*',
+    '/about/:path*', '/features/:path*', '/admissions/:path*', '/journey/:path*', '/careers/:path*',
     '/settings/:path*', '/contact/:path*', '/activity/:path*',
     '/enquiries/:path*', '/enrolments/:path*', '/users/:path*',
     '/login', '/login/:path*'

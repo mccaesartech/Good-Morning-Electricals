@@ -23,8 +23,13 @@ const NAV: { group: string; items: NavItem[] }[] = [
     group: 'Content',
     items: [
       { href: '/hero', label: 'Hero Section', permission: 'manage_hero' },
+      { href: '/about', label: 'About', permission: 'manage_hero' },
+      { href: '/features', label: 'Why Choose Us', permission: 'manage_hero' },
       { href: '/programmes', label: 'Programmes', permission: 'manage_programmes' },
       { href: '/facilities', label: 'Facilities', permission: 'manage_facilities' },
+      { href: '/journey', label: 'Student Journey', permission: 'manage_programmes' },
+      { href: '/careers', label: 'Career Paths', permission: 'manage_programmes' },
+      { href: '/admissions', label: 'Admissions', permission: 'manage_hero' },
       { href: '/staff', label: 'Staff', permission: 'manage_staff' },
       { href: '/gallery', label: 'Gallery', permission: 'manage_gallery' },
       { href: '/testimonials', label: 'Testimonials', permission: 'manage_testimonials' },

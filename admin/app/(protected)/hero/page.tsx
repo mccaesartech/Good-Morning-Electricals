@@ -9,6 +9,13 @@ const FIELDS = [
   { name: 'cta_primary', label: 'Primary Button Text', type: 'text' as const, col: 'half' as const },
   { name: 'cta_secondary', label: 'Secondary Button Text', type: 'text' as const, col: 'half' as const },
   { name: 'bg_image_url', label: 'Background Image', type: 'image' as const, imageFolder: 'hero', col: 'full' as const },
+  {
+    name: 'statistics',
+    label: 'Statistics (JSON array)',
+    type: 'json' as const,
+    col: 'full' as const,
+    placeholder: '[{"number":"500+","label":"Students Trained","count":500}]'
+  },
   { name: 'status', label: 'Status', type: 'select' as const, col: 'half' as const }
 ];
 

@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { adminPath } from '@/lib/constants';
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const errorParam = searchParams.get('error');
-  const redirectTo = searchParams.get('redirect') || '/dashboard';
+  const redirectTo = searchParams.get('redirect') || adminPath('/dashboard');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -63,7 +64,7 @@ export default function LoginForm() {
     setError('');
     setResetMsg('');
     const supabase = createClient();
-    const redirectUrl = `${window.location.origin}/admin/auth/callback?next=/login`;
+    const redirectUrl = `${window.location.origin}${adminPath('/auth/callback')}?next=${encodeURIComponent(adminPath('/login'))}`;
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl
     });

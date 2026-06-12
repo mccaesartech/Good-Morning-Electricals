@@ -122,4 +122,11 @@ function copyStaticSite() {
 
 copyStaticSite();
 
+const adminAssetsDir = path.join(root, 'public', 'admin', 'assets');
+fs.mkdirSync(adminAssetsDir, { recursive: true });
+fs.copyFileSync(
+  path.join(root, 'assets', 'logo.png'),
+  path.join(adminAssetsDir, 'logo.png')
+);
+
 console.log('Prepared Next.js app at repository root for Vercel build.');

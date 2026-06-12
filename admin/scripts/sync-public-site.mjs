@@ -49,4 +49,11 @@ for (const dir of DIRS) {
   copyRecursive(src, dest);
 }
 
+const adminAssetsDir = path.join(publicDir, 'admin', 'assets');
+fs.mkdirSync(adminAssetsDir, { recursive: true });
+fs.copyFileSync(
+  path.join(repoRoot, 'assets', 'logo.png'),
+  path.join(adminAssetsDir, 'logo.png')
+);
+
 console.log('Synced marketing site assets into admin/public for deploy.');

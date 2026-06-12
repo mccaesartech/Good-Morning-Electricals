@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { adminPath } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
 import { hasPermission } from '@/lib/permissions';
@@ -41,25 +42,25 @@ export default async function DashboardPage() {
 
       <div className="dash-stats">
         {hasPermission(perms, 'manage_programmes') && (
-          <StatCard href="/programmes" count={programmes} label="Programmes" icon="🎓" variant="gold" />
+          <StatCard href={adminPath('/programmes')} count={programmes} label="Programmes" icon="🎓" variant="gold" />
         )}
         {hasPermission(perms, 'manage_staff') && (
-          <StatCard href="/staff" count={staff} label="Staff" icon="👥" variant="blue" />
+          <StatCard href={adminPath('/staff')} count={staff} label="Staff" icon="👥" variant="blue" />
         )}
         {hasPermission(perms, 'manage_gallery') && (
-          <StatCard href="/gallery" count={gallery} label="Gallery Photos" icon="🖼️" variant="green" />
+          <StatCard href={adminPath('/gallery')} count={gallery} label="Gallery Photos" icon="🖼️" variant="green" />
         )}
         {hasPermission(perms, 'manage_testimonials') && (
-          <StatCard href="/testimonials" count={testimonials} label="Testimonials" icon="💬" variant="purple" />
+          <StatCard href={adminPath('/testimonials')} count={testimonials} label="Testimonials" icon="💬" variant="purple" />
         )}
         {hasPermission(perms, 'manage_faq') && (
-          <StatCard href="/faq" count={faq} label="FAQ Items" icon="❓" variant="gold" />
+          <StatCard href={adminPath('/faq')} count={faq} label="FAQ Items" icon="❓" variant="gold" />
         )}
         {hasPermission(perms, ['view_enquiries', 'manage_enquiries']) && (
-          <StatCard href="/enquiries" count={enquiries} label="Enquiries" icon="📩" variant="blue" />
+          <StatCard href={adminPath('/enquiries')} count={enquiries} label="Enquiries" icon="📩" variant="blue" />
         )}
         {hasPermission(perms, ['view_enrolments', 'manage_enrolments']) && (
-          <StatCard href="/enrolments" count={enrolments} label="Enrolments" icon="📋" variant="green" />
+          <StatCard href={adminPath('/enrolments')} count={enrolments} label="Enrolments" icon="📋" variant="green" />
         )}
       </div>
 
@@ -68,16 +69,16 @@ export default async function DashboardPage() {
           <h3>Quick Actions</h3>
           <div className="quick-links">
             {hasPermission(perms, 'manage_programmes') && (
-              <Link href="/programmes" className="btn btn-secondary btn-sm">Programmes</Link>
+              <Link href={adminPath('/programmes')} className="btn btn-secondary btn-sm">Programmes</Link>
             )}
             {hasPermission(perms, ['view_enquiries', 'manage_enquiries']) && (
-              <Link href="/enquiries" className="btn btn-secondary btn-sm">View Enquiries</Link>
+              <Link href={adminPath('/enquiries')} className="btn btn-secondary btn-sm">View Enquiries</Link>
             )}
             {hasPermission(perms, ['view_enrolments', 'manage_enrolments']) && (
-              <Link href="/enrolments" className="btn btn-secondary btn-sm">View Enrolments</Link>
+              <Link href={adminPath('/enrolments')} className="btn btn-secondary btn-sm">View Enrolments</Link>
             )}
             {hasPermission(perms, 'manage_settings') && (
-              <Link href="/settings" className="btn btn-secondary btn-sm">Site Settings</Link>
+              <Link href={adminPath('/settings')} className="btn btn-secondary btn-sm">Site Settings</Link>
             )}
           </div>
         </div>
@@ -96,7 +97,7 @@ export default async function DashboardPage() {
         <div className="card">
           <h3>Audit Trail</h3>
           <p>All admin actions are recorded in the Activity Log for compliance and review.</p>
-          <Link href="/activity" className="btn btn-ghost-dark btn-sm" style={{ marginTop: '0.75rem' }}>
+          <Link href={adminPath('/activity')} className="btn btn-ghost-dark btn-sm" style={{ marginTop: '0.75rem' }}>
             Open Activity Log →
           </Link>
         </div>

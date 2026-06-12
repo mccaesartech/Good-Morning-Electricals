@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
+import { adminPath } from '@/lib/constants';
 import AdminShell from '@/components/AdminShell';
 import { ProfileProvider } from '@/components/ProfileProvider';
 
@@ -9,7 +10,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   const profile = await requireAdmin(supabase);
 
   if (!profile) {
-    redirect('/login?error=unauthorized');
+    redirect(`${adminPath('/login')}?error=unauthorized`);
   }
 
   return (

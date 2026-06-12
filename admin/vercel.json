@@ -5,8 +5,5 @@
   "redirects": [
     { "source": "/login", "destination": "/admin/login", "permanent": false },
     { "source": "/login/:path*", "destination": "/admin/login/:path*", "permanent": false }
-  ],
-  "rewrites": [
-    { "source": "/", "destination": "/index.html" }
   ]
 }

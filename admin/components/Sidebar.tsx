@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { AdminProfile } from '@/lib/auth';
 import { hasPermission, type Permission } from '@/lib/permissions';
-import { publicSiteUrl } from '@/lib/constants';
+import { adminPath, publicSiteUrl } from '@/lib/constants';
 import Logo from './Logo';
 import LogoutButton from './LogoutButton';
 
@@ -48,7 +48,8 @@ const NAV: { group: string; items: NavItem[] }[] = [
 ];
 
 function isActive(pathname: string, href: string): boolean {
-  return pathname === href || (href !== '/dashboard' && pathname.startsWith(`${href}/`));
+  const full = adminPath(href);
+  return pathname === full || (href !== '/dashboard' && pathname.startsWith(`${full}/`));
 }
 
 export default function Sidebar({
@@ -86,7 +87,7 @@ export default function Sidebar({
               {visible.map((item) => (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={adminPath(item.href)}
                   className={`nav-item${isActive(pathname, item.href) ? ' active' : ''}`}
                   onClick={onClose}
                 >

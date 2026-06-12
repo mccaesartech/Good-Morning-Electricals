@@ -1,8 +1,12 @@
 export const BASE_PATH = '/admin';
 
-export function assetUrl(path: string): string {
+export function adminPath(path: string): string {
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return `${BASE_PATH}${normalized}`;
+}
+
+export function assetUrl(path: string): string {
+  return adminPath(path);
 }
 
 /** Public marketing site root (not the /admin app). */

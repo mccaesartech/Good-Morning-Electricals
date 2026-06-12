@@ -21,7 +21,8 @@ const TITLES: Record<string, { title: string; subtitle: string }> = {
 
 export default function TopbarTitle() {
   const pathname = usePathname();
-  const meta = TITLES[pathname] ?? { title: 'Admin', subtitle: 'Content management' };
+  const adminRoute = pathname.replace(/^\/admin/, '') || '/dashboard';
+  const meta = TITLES[adminRoute] ?? { title: 'Admin', subtitle: 'Content management' };
 
   return (
     <div className="topbar__title">

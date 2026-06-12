@@ -18,9 +18,10 @@ export default async function DashboardPage() {
   const profile = await requireAdmin(supabase);
   if (!profile) return null;
 
-  const [programmes, staff, gallery, testimonials, faq, enquiries, enrolments] =
+  const [programmes, facilities, staff, gallery, testimonials, faq, enquiries, enrolments] =
     await Promise.all([
       getCount('programmes'),
+      getCount('facilities'),
       getCount('staff'),
       getCount('gallery'),
       getCount('testimonials'),
@@ -44,11 +45,14 @@ export default async function DashboardPage() {
         {hasPermission(perms, 'manage_programmes') && (
           <StatCard href={adminPath('/programmes')} count={programmes} label="Programmes" icon="🎓" variant="gold" />
         )}
-        {hasPermission(perms, 'manage_staff') && (
-          <StatCard href={adminPath('/staff')} count={staff} label="Instructors & Staff" icon="👥" variant="blue" />
+        {hasPermission(perms, 'manage_facilities') && (
+          <StatCard href={adminPath('/facilities')} count={facilities} label="Facilities & Training" icon="🏗️" variant="blue" />
         )}
         {hasPermission(perms, 'manage_gallery') && (
           <StatCard href={adminPath('/gallery')} count={gallery} label="Photo Gallery" icon="🖼️" variant="green" />
+        )}
+        {hasPermission(perms, 'manage_staff') && (
+          <StatCard href={adminPath('/staff')} count={staff} label="Instructors & Staff" icon="👥" variant="purple" />
         )}
         {hasPermission(perms, 'manage_testimonials') && (
           <StatCard href={adminPath('/testimonials')} count={testimonials} label="Testimonials" icon="💬" variant="purple" />
@@ -71,11 +75,14 @@ export default async function DashboardPage() {
             {hasPermission(perms, 'manage_programmes') && (
               <Link href={adminPath('/programmes')} className="btn btn-secondary btn-sm">Programmes</Link>
             )}
-            {hasPermission(perms, 'manage_staff') && (
-              <Link href={adminPath('/staff')} className="btn btn-secondary btn-sm">Instructors & Staff</Link>
+            {hasPermission(perms, 'manage_facilities') && (
+              <Link href={adminPath('/facilities')} className="btn btn-secondary btn-sm">Facilities & Training</Link>
             )}
             {hasPermission(perms, 'manage_gallery') && (
               <Link href={adminPath('/gallery')} className="btn btn-secondary btn-sm">Photo Gallery</Link>
+            )}
+            {hasPermission(perms, 'manage_staff') && (
+              <Link href={adminPath('/staff')} className="btn btn-secondary btn-sm">Instructors & Staff</Link>
             )}
             {hasPermission(perms, ['view_enquiries', 'manage_enquiries']) && (
               <Link href={adminPath('/enquiries')} className="btn btn-secondary btn-sm">View Enquiries</Link>

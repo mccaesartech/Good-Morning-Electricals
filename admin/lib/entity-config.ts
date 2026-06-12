@@ -103,7 +103,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
   },
   gallery: {
     table: 'gallery',
-    label: 'Photo Gallery',
+    label: 'Practical & Field Photos',
     labelSingular: 'Gallery Photo',
     imageFolder: 'gallery',
     columns: [
@@ -112,7 +112,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { key: 'status', label: 'Status' }
     ],
     fields: [
-      { name: 'caption', label: 'Caption', type: 'text', required: true, col: 'full' },
+      { name: 'caption', label: 'Caption', type: 'text', required: true, col: 'full', placeholder: 'e.g. Students during workshop practical' },
       { name: 'alt_text', label: 'Alt Text', type: 'text', col: 'full' },
       { name: 'image_url', label: 'Image', type: 'image', imageFolder: 'gallery', required: true, col: 'full' },
       { name: 'sort_order', label: 'Sort Order', type: 'number', col: 'half' },
@@ -160,8 +160,8 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
   },
   facilities: {
     table: 'facilities',
-    label: 'Facilities',
-    labelSingular: 'Facility',
+    label: 'Facility Cards',
+    labelSingular: 'Facility Card',
     imageFolder: 'facilities',
     columns: [
       { key: 'title', label: 'Title' },

@@ -6,12 +6,12 @@ admin/.env.local
 # Vercel root build artifacts (generated from admin/ during deploy)
 node_modules/
 .next/
-app/
-components/
+/app/
+/components/
 /lib/
-public/
-middleware.ts
-next-env.d.ts
+/public/
+/middleware.ts
+/next-env.d.ts
 
 # OS / editor
 .DS_Store

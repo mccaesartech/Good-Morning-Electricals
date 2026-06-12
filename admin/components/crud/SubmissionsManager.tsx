@@ -58,6 +58,7 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
   const config = CONFIGS[type];
   const profile = useProfile();
   const canEdit = canManage(profile.permissions, config.managePermission);
+  const canDelete = profile.role === 'superadmin';
   const toast = useToast();
 
   const [rows, setRows] = useState<Row[]>([]);
@@ -110,7 +111,7 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
   }
 
   async function handleDelete() {
-    if (!deleteTarget || !canEdit || saving) return;
+    if (!deleteTarget || !canDelete || saving) return;
     setSaving(true);
     const supabase = createClient();
     const { error: deleteError } = await supabase.from(config.table).delete().eq('id', deleteTarget.id);
@@ -189,7 +190,7 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
                       <button type="button" className="btn btn-primary btn-sm" disabled={saving}
                         onClick={() => updateStatus(row.id, 'admitted')}>Mark Admitted</button>
                     )}
-                    {canEdit && (
+                    {canDelete && (
                       <button type="button" className="btn btn-danger btn-sm" onClick={() => setDeleteTarget(row)}>
                         Delete
                       </button>

@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import Link from 'next/link';
 import Logo from '@/components/Logo';
 import LoginForm from '@/components/LoginForm';
 
@@ -13,9 +12,9 @@ export default function LoginPage() {
         <Suspense fallback={<p>Loading…</p>}>
           <LoginForm />
         </Suspense>
-        <Link href="/" className="back-link">
+        <a href="/" className="back-link">
           ← Back to Website
-        </Link>
+        </a>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { AdminProfile } from '@/lib/auth';
 import { hasPermission, type Permission } from '@/lib/permissions';
+import { publicSiteUrl } from '@/lib/constants';
 import Logo from './Logo';
 import LogoutButton from './LogoutButton';
 
@@ -98,9 +99,14 @@ export default function Sidebar({
       </nav>
 
       <div className="sidebar__footer">
-        <Link href="/" target="_blank" className="btn btn-ghost btn-sm sidebar-view-site">
-          View Site
-        </Link>
+        <a
+          href={publicSiteUrl(true)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-ghost btn-sm sidebar-view-site"
+        >
+          View Live Site
+        </a>
         <LogoutButton />
       </div>
     </aside>

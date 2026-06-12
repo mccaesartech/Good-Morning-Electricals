@@ -7,6 +7,8 @@ const FIELDS = [
   { name: 'tagline', label: 'Tagline', type: 'text' as const, col: 'full' as const },
   { name: 'established_year', label: 'Established Year', type: 'text' as const, col: 'half' as const },
   { name: 'logo_url', label: 'Logo URL', type: 'image' as const, imageFolder: 'branding', col: 'full' as const },
+  { name: 'favicon_url', label: 'Favicon URL', type: 'image' as const, imageFolder: 'branding', col: 'half' as const },
+  { name: 'og_image_url', label: 'Social Share Image (OG)', type: 'image' as const, imageFolder: 'branding', col: 'half' as const },
   { name: 'footer_description', label: 'Footer Description', type: 'textarea' as const, rows: 3, col: 'full' as const },
   { name: 'footer_copyright', label: 'Footer Copyright', type: 'text' as const, col: 'full' as const },
   { name: 'social_facebook', label: 'Facebook URL', type: 'text' as const, col: 'half' as const },

@@ -106,13 +106,6 @@ export default function SingletonEditor({
   }
 
   async function saveRecord(publish: boolean) {
-    if (!recordId) {
-      const msg = 'No record found in database.';
-      setError(msg);
-      toast.error(msg);
-      return;
-    }
-
     if (saving) return;
 
     setSaving(true);
@@ -147,23 +140,41 @@ export default function SingletonEditor({
     }
 
     const supabase = createClient();
-    const { error: updateError } = await supabase.from(table).update(payload).eq('id', recordId);
+    let savedId = recordId;
 
-    if (updateError) {
-      const msg = friendlyError(updateError.message, 'Failed to save content');
-      setError(msg);
-      toast.error(msg);
-      setSaving(false);
-      return;
+    if (recordId) {
+      const { error: updateError } = await supabase.from(table).update(payload).eq('id', recordId);
+      if (updateError) {
+        const msg = friendlyError(updateError.message, 'Failed to save content');
+        setError(msg);
+        toast.error(msg);
+        setSaving(false);
+        return;
+      }
+      await logActivity('updated', table, `Updated ${entityLabel}`, recordId);
+    } else {
+      const { data: inserted, error: insertError } = await supabase
+        .from(table)
+        .insert(payload)
+        .select('id')
+        .single();
+      if (insertError || !inserted) {
+        const msg = friendlyError(insertError?.message ?? 'Insert failed', 'Failed to save content');
+        setError(msg);
+        toast.error(msg);
+        setSaving(false);
+        return;
+      }
+      savedId = inserted.id as string;
+      setRecordId(savedId);
+      await logActivity('created', table, `Created ${entityLabel}`, savedId);
     }
-
-    await logActivity('updated', table, `Updated ${entityLabel}`, recordId);
 
     if (publish) {
       notifyContentPublished();
-      toast.success('Changes published successfully');
+      toast.success('Published — open the live site (or refresh) to see changes');
     } else {
-      toast.success('Content saved successfully (draft — not visible on website)');
+      toast.success('Saved as draft — not visible on the live website until published');
     }
 
     setSaving(false);

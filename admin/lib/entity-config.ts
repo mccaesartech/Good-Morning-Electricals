@@ -80,7 +80,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
   },
   staff: {
     table: 'staff',
-    label: 'Staff',
+    label: 'Instructors & Staff',
     labelSingular: 'Staff Member',
     imageFolder: 'staff',
     columns: [
@@ -103,7 +103,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
   },
   gallery: {
     table: 'gallery',
-    label: 'Gallery',
+    label: 'Photo Gallery',
     labelSingular: 'Gallery Photo',
     imageFolder: 'gallery',
     columns: [

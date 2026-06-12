@@ -45,10 +45,10 @@ export default async function DashboardPage() {
           <StatCard href={adminPath('/programmes')} count={programmes} label="Programmes" icon="🎓" variant="gold" />
         )}
         {hasPermission(perms, 'manage_staff') && (
-          <StatCard href={adminPath('/staff')} count={staff} label="Staff" icon="👥" variant="blue" />
+          <StatCard href={adminPath('/staff')} count={staff} label="Instructors & Staff" icon="👥" variant="blue" />
         )}
         {hasPermission(perms, 'manage_gallery') && (
-          <StatCard href={adminPath('/gallery')} count={gallery} label="Gallery Photos" icon="🖼️" variant="green" />
+          <StatCard href={adminPath('/gallery')} count={gallery} label="Photo Gallery" icon="🖼️" variant="green" />
         )}
         {hasPermission(perms, 'manage_testimonials') && (
           <StatCard href={adminPath('/testimonials')} count={testimonials} label="Testimonials" icon="💬" variant="purple" />
@@ -70,6 +70,12 @@ export default async function DashboardPage() {
           <div className="quick-links">
             {hasPermission(perms, 'manage_programmes') && (
               <Link href={adminPath('/programmes')} className="btn btn-secondary btn-sm">Programmes</Link>
+            )}
+            {hasPermission(perms, 'manage_staff') && (
+              <Link href={adminPath('/staff')} className="btn btn-secondary btn-sm">Instructors & Staff</Link>
+            )}
+            {hasPermission(perms, 'manage_gallery') && (
+              <Link href={adminPath('/gallery')} className="btn btn-secondary btn-sm">Photo Gallery</Link>
             )}
             {hasPermission(perms, ['view_enquiries', 'manage_enquiries']) && (
               <Link href={adminPath('/enquiries')} className="btn btn-secondary btn-sm">View Enquiries</Link>

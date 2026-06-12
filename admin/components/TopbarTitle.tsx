@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation';
 const TITLES: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': { title: 'Dashboard', subtitle: 'Overview of your academy website' },
   '/programmes': { title: 'Programmes', subtitle: 'Manage training programmes' },
-  '/staff': { title: 'Staff', subtitle: 'Manage faculty and team members' },
-  '/gallery': { title: 'Gallery', subtitle: 'Manage photo gallery' },
+  '/staff': { title: 'Instructors & Staff', subtitle: 'Our Instructors & Staff section on the public site' },
+  '/gallery': { title: 'Photo Gallery', subtitle: 'Upload and manage gallery photos on the public site' },
   '/testimonials': { title: 'Testimonials', subtitle: 'Manage student testimonials' },
   '/faq': { title: 'FAQ', subtitle: 'Manage frequently asked questions' },
   '/facilities': { title: 'Facilities', subtitle: 'Manage facility highlights' },

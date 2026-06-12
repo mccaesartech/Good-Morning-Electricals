@@ -29,4 +29,8 @@ Run these **in order** in the Supabase SQL Editor after migrations `001`–`009`
 2. Create Database Webhooks (Supabase Dashboard → Database → Webhooks):
    - **Table** `contact_enquiries`, event `INSERT` → `send-notification`
    - **Table** `enrolments`, event `INSERT` → `send-notification`
-3. Set Edge Function secrets: `RESEND_API_KEY`, `FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`
+3. Set **Vercel** environment variables (Settings → Environment Variables):
+   - `SUPABASE_SERVICE_ROLE_KEY` — required for User Management
+   - `RESEND_API_KEY`, `FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL` — enrolment email notifications
+   - `AT_USERNAME`, `AT_API_KEY`, `SMS_SENDER_ID` — optional SMS notifications
+4. Set Edge Function secrets (backup): same `RESEND_*` and `AT_*` values

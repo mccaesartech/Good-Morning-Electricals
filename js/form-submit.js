@@ -41,17 +41,11 @@
   }
 
   function sendNotification(table, record) {
-    var cfg = getConfig();
-    if (!cfg.url || !cfg.anonKey) return Promise.resolve();
-    var endpoint = cfg.url.replace(/\/$/, '') + '/functions/v1/send-notification';
-    return fetch(endpoint, {
+    var type = table === 'enrolments' ? 'enrolment' : 'enquiry';
+    return fetch('/api/notify', {
       method: 'POST',
-      headers: {
-        apikey: cfg.anonKey,
-        Authorization: 'Bearer ' + cfg.anonKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ table: table, record: record })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: type, record: record })
     }).catch(function () { /* non-blocking */ });
   }
 

@@ -31,7 +31,12 @@ export async function PATCH(
     return NextResponse.json({ error: 'You cannot deactivate your own account.' }, { status: 400 });
   }
 
-  const service = createServiceClient();
+  let service;
+  try {
+    service = createServiceClient();
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  }
   const payload: Record<string, unknown> = { updated_by: auth.user.id };
   if (full_name !== undefined) payload.full_name = full_name;
   if (role !== undefined) payload.role = role;
@@ -67,11 +72,18 @@ export async function DELETE(
     return NextResponse.json({ error: 'You cannot delete your own account.' }, { status: 400 });
   }
 
-  const service = createServiceClient();
+  let service;
+  try {
+    service = createServiceClient();
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  }
+
+  const { error: authError } = await service.auth.admin.deleteUser(params.id);
+  if (authError) return NextResponse.json({ error: authError.message }, { status: 500 });
+
   const { error: dbError } = await service.from('admin_users').delete().eq('id', params.id);
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
-
-  await service.auth.admin.deleteUser(params.id);
 
   await service.from('activity_log').insert({
     user_id: auth.user.id,

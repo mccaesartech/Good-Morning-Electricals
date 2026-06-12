@@ -107,9 +107,24 @@ export default function UsersManager() {
       });
       const json = await res.json();
       if (!res.ok) {
-        const msg = friendlyError(json.error ?? 'Update failed', 'Failed to save content');
+        const msg = friendlyError(json.error ?? 'Update failed', 'Failed to save user');
         setError(msg);
         toast.error(msg);
+      } else if (form.password && form.password.length >= 8) {
+        const pwRes = await fetch(`/admin/api/users/${editing.id}/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: form.password })
+        });
+        const pwJson = await pwRes.json();
+        if (!pwRes.ok) {
+          const msg = friendlyError(pwJson.error ?? 'Password update failed', 'Failed to set password');
+          setError(msg);
+          toast.error(msg);
+        } else {
+          toast.success('User updated and password set successfully');
+          ok = true;
+        }
       } else {
         toast.success('User updated successfully');
         ok = true;
@@ -260,6 +275,18 @@ export default function UsersManager() {
             <label>Full Name</label>
             <input type="text" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
           </div>
+          {editing && (
+            <div className="form-field">
+              <label>Set new password (optional)</label>
+              <input
+                type="password"
+                minLength={8}
+                value={form.password}
+                placeholder="Leave blank to keep current password"
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+            </div>
+          )}
           <div className="form-field">
             <label>Role *</label>
             <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as AdminRole })}>

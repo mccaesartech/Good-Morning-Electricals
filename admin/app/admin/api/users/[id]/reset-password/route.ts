@@ -20,7 +20,12 @@ export async function POST(
 
   const body = await request.json().catch(() => ({}));
   const password = (body as { password?: string }).password;
-  const service = createServiceClient();
+  let service;
+  try {
+    service = createServiceClient();
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  }
 
   if (password && password.length >= 8) {
     const { error } = await service.auth.admin.updateUserById(params.id, { password });
@@ -31,7 +36,7 @@ export async function POST(
 
     const origin = request.headers.get('origin') ?? process.env.NEXT_PUBLIC_SITE_URL ?? '';
     const { error } = await service.auth.resetPasswordForEmail(userRow.email, {
-      redirectTo: `${origin}/admin/auth/callback?next=/login`
+      redirectTo: `${origin}/admin/auth/callback?next=${encodeURIComponent('/admin/reset-password')}`
     });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   }

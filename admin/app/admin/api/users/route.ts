@@ -16,7 +16,12 @@ export async function GET() {
   const auth = await requireSuperAdmin();
   if (!auth) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const service = createServiceClient();
+  let service;
+  try {
+    service = createServiceClient();
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  }
   const { data, error } = await service
     .from('admin_users')
     .select('id, email, full_name, role, active, last_login_at, custom_permissions, created_at')
@@ -43,7 +48,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Email, password, and role are required.' }, { status: 400 });
   }
 
-  const service = createServiceClient();
+  let service;
+  try {
+    service = createServiceClient();
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  }
 
   const { data: authUser, error: createError } = await service.auth.admin.createUser({
     email,

@@ -3,7 +3,7 @@ import { updateSession } from '@/lib/supabase/middleware';
 import { BASE_PATH } from '@/lib/constants';
 import { ROUTE_PERMISSIONS, hasPermission, type Permission } from '@/lib/permissions';
 
-const PUBLIC_PATHS = [`${BASE_PATH}/login`, `${BASE_PATH}/auth/callback`];
+const PUBLIC_PATHS = [`${BASE_PATH}/login`, `${BASE_PATH}/auth/callback`, `${BASE_PATH}/reset-password`];
 
 const PROTECTED_PREFIXES = [
   `${BASE_PATH}/dashboard`,
@@ -106,6 +106,8 @@ export const config = {
     '/admin/enrolments/:path*',
     '/admin/users/:path*',
     '/admin/login',
-    '/admin/login/:path*'
+    '/admin/login/:path*',
+    '/admin/auth/callback',
+    '/admin/reset-password'
   ]
 };

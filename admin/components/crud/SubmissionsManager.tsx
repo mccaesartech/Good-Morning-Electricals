@@ -96,13 +96,38 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
     if (status === 'contacted') payload.contacted_at = new Date().toISOString();
     if (status === 'admitted') payload.admitted_at = new Date().toISOString();
 
+    const row = rows.find((r) => r.id === id);
     const { error: updateError } = await supabase.from(config.table).update(payload).eq('id', id);
     if (updateError) {
-      const msg = friendlyError(updateError.message, 'Failed to save content');
+      const msg = friendlyError(updateError.message, 'Failed to update status');
       setError(msg);
       toast.error(msg);
     } else {
-      toast.success('Content saved successfully');
+      if (type === 'enrolments' && row && ['contacted', 'admitted', 'pending'].includes(status)) {
+        try {
+          await fetch('/admin/api/enrolments/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              status,
+              record: {
+                full_name: row.full_name,
+                email: row.email,
+                phone: row.phone,
+                programme: row.programme
+              }
+            })
+          });
+        } catch {
+          /* status saved even if notification fails */
+        }
+      }
+      const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+      toast.success(
+        type === 'enrolments'
+          ? `Status updated to ${statusLabel}. Applicant notified by email/SMS if configured.`
+          : 'Status updated successfully'
+      );
       await logActivity('updated', config.table, `Updated ${config.entityLabel} status to ${status}`, id);
       setSelected(null);
       await load();
@@ -235,6 +260,10 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
               {selected.education_level != null && String(selected.education_level) !== '' && (
                 <p><strong>Education:</strong> {String(selected.education_level)}</p>
               )}
+              {selected.date_of_birth != null && String(selected.date_of_birth) !== '' && (
+                <p><strong>Date of birth:</strong> {String(selected.date_of_birth)}</p>
+              )}
+              <p><strong>Status:</strong> {String(selected.status)}</p>
               <p><strong>Submitted:</strong> {new Date(String(selected.created_at)).toLocaleString()}</p>
             </div>
           </div>

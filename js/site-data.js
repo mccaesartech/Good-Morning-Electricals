@@ -217,44 +217,7 @@
       }).join('');
   }
 
-  var CMS_GRID_IDS = [
-    'features-grid',
-    'programmes-grid',
-    'facilities-grid',
-    'journey-timeline',
-    'careers-grid',
-    'testimonials-grid',
-    'staff-grid',
-    'gallery-grid',
-    'faq-list'
-  ];
-
-  function hideCmsError() {
-    var banner = document.getElementById('gme-cms-error');
-    if (banner) banner.hidden = true;
-  }
-
-  function showCmsError(message) {
-    var banner = document.getElementById('gme-cms-error');
-    if (!banner) return;
-    var text = banner.querySelector('.gme-cms-error__text');
-    if (text) text.textContent = message;
-    banner.hidden = false;
-  }
-
-  function showCmsContent() {
-    CMS_GRID_IDS.forEach(function (id) {
-      var root = document.getElementById(id);
-      if (!root) return;
-      root.querySelectorAll('.reveal').forEach(function (el) {
-        el.classList.add('visible');
-      });
-    });
-  }
-
   function render(data) {
-    hideCmsError();
-    document.documentElement.setAttribute('data-cms-loaded', 'true');
     var s = data.settings;
 
     if (s.metaTitle) document.title = s.metaTitle;
@@ -575,30 +538,20 @@
     populateProgrammeSelect(document.getElementById('programme'), data.programmes);
     populateProgrammeSelect(document.getElementById('enrol-programme'), data.programmes);
 
-    showCmsContent();
     if (window.GME_initReveal) window.GME_initReveal();
     if (window.GME_initStats) window.GME_initStats();
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    if (!window.GME_Supabase) {
-      showCmsError('Site content could not load. Please refresh the page or try again in a moment.');
-      return;
-    }
+    if (!window.GME_Supabase) return;
 
     GME_Supabase.loadSiteContent({ force: true })
       .then(function (raw) {
         var data = normalize(raw);
-        if (data) {
-          render(data);
-        } else {
-          showCmsError('Published content is empty. Save items in the admin with Save & Publish.');
-        }
+        if (data) render(data);
       })
       .catch(function (err) {
-        var msg = err && err.message ? err.message : String(err);
-        console.warn('[GME] Could not load site content from Supabase:', msg);
-        showCmsError('Could not load latest content. Showing page defaults. (' + msg + ')');
+        console.warn('[GME] Could not load site content from Supabase:', err && err.message ? err.message : err);
       });
 
     function onContentPublished() {

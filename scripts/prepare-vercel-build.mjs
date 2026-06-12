@@ -117,7 +117,7 @@ function copyStaticSite() {
     if (file === 'index.html') {
       let html = readTextNormalized(src);
       html = html.replace(
-        /(<script src="(?:js\/[^"]+\.js|script\.js))(?:\?v=[^"]*)?(">)/g,
+        /(<script src="(?:js\/[^"]+\.js|script\.js))(">)/g,
         `$1?v=${assetVersion}$2`
       );
       writeUtf8(dest, html);

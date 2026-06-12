@@ -1981,60 +1981,6 @@ address { font-style: normal; }
   box-shadow: var(--shadow-xl);
 }
 
-/* CMS load error banner */
-.gme-cms-error {
-  position: fixed;
-  bottom: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  max-width: min(92vw, 36rem);
-  padding: 0.85rem 1rem;
-  border-radius: 0.75rem;
-  background: #7f1d1d;
-  color: #fff;
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.gme-cms-error__text {
-  margin: 0;
-  flex: 1 1 12rem;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.gme-cms-error__retry {
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  background: transparent;
-  color: inherit;
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.75rem;
-  cursor: pointer;
-  font: inherit;
-}
-
-.gme-cms-error__retry:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-/* CMS grids show content immediately once loaded */
-html[data-cms-loaded="true"] #staff-grid .reveal,
-html[data-cms-loaded="true"] #gallery-grid .reveal,
-html[data-cms-loaded="true"] #journey-timeline .reveal,
-html[data-cms-loaded="true"] #facilities-grid .reveal,
-html[data-cms-loaded="true"] #programmes-grid .reveal,
-html[data-cms-loaded="true"] #features-grid .reveal,
-html[data-cms-loaded="true"] #careers-grid .reveal,
-html[data-cms-loaded="true"] #testimonials-grid .reveal,
-html[data-cms-loaded="true"] #faq-list .reveal {
-  opacity: 1;
-  transform: none;
-}
-
 /* Scroll Animations */
 .reveal {
   opacity: 0;

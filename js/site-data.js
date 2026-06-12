@@ -585,7 +585,7 @@
       if (!document.hidden) {
         onContentPublished();
       }
-    }, 10000);
+    }, 5000);
   });
 
   window.GME_render = render;

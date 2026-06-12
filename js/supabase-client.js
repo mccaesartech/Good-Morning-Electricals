@@ -22,7 +22,29 @@
     return { url: url, anonKey: anonKey };
   }
 
-  function fetchPublishedContent() {
+  function parseJsonResponse(res) {
+    if (!res.ok) {
+      return res.text().then(function (body) {
+        throw new Error('Content request failed: ' + res.status + (body ? ' ' + body.slice(0, 120) : ''));
+      });
+    }
+    return res.json();
+  }
+
+  function fetchFromApi() {
+    var version = encodeURIComponent(getContentVersion());
+    return fetch('/api/site-content?_=' + Date.now() + '&v=' + version, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: {
+        Accept: 'application/json',
+        'Cache-Control': 'no-cache, no-store',
+        Pragma: 'no-cache'
+      }
+    }).then(parseJsonResponse);
+  }
+
+  function fetchFromSupabaseRpc() {
     var cfg = getConfig();
     if (!cfg.url || !cfg.anonKey) {
       return Promise.reject(new Error('Supabase not configured'));
@@ -40,9 +62,12 @@
         Pragma: 'no-cache'
       },
       body: '{}'
-    }).then(function (res) {
-      if (!res.ok) throw new Error('Supabase RPC failed: ' + res.status);
-      return res.json();
+    }).then(parseJsonResponse);
+  }
+
+  function fetchPublishedContent() {
+    return fetchFromApi().catch(function () {
+      return fetchFromSupabaseRpc();
     });
   }
 
@@ -68,6 +93,6 @@
     getConfig: getConfig,
     loadSiteContent: loadSiteContent,
     refreshSiteContent: refreshSiteContent,
-    clearCache: function () { /* no-op — cache removed for live sync */ }
+    clearCache: function () { /* no-op */ }
   };
 })();

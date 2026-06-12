@@ -117,7 +117,7 @@ function copyStaticSite() {
     if (file === 'index.html') {
       let html = readTextNormalized(src);
       html = html.replace(
-        /(<script src="(?:js\/[^"]+\.js|script\.js))(">)/g,
+        /(<script src="(?:js\/[^"]+\.js|script\.js))(?:\?v=[^"]*)?(">)/g,
         `$1?v=${assetVersion}$2`
       );
       writeUtf8(dest, html);
@@ -140,6 +140,11 @@ function copyStaticSite() {
 }
 
 copyStaticSite();
+
+/** Keep admin/public marketing assets aligned with root source for local preview. */
+const adminPublicJs = path.join(adminDir, 'public', 'js');
+removeIfExists(adminPublicJs);
+copyRecursive(path.join(root, 'js'), adminPublicJs);
 
 const adminAssetsDir = path.join(root, 'public', 'admin', 'assets');
 fs.mkdirSync(adminAssetsDir, { recursive: true });

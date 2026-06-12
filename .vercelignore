@@ -1,4 +1,6 @@
-admin
+admin/node_modules
+admin/.next
+admin/.env.local
 admin.html
 admin.css
 admin.js

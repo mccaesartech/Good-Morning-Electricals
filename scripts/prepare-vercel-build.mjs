@@ -1,17 +1,28 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const root = process.cwd();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(__dirname, '..');
 const adminDir = path.join(root, 'admin');
 
-const copies = [
+/** Paths relative to admin/ that must exist for the root Next.js build. */
+const REQUIRED_COPIES = [
   ['app', 'app'],
   ['components', 'components'],
   ['lib', 'lib'],
   ['public', 'public'],
-  ['middleware.ts', 'middleware.ts'],
+  ['middleware.ts', 'middleware.ts']
+];
+
+/** Generated locally; create a minimal stub if absent on CI. */
+const OPTIONAL_COPIES = [
   ['next-env.d.ts', 'next-env.d.ts']
 ];
+
+const NEXT_ENV_STUB = `/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+`;
 
 function copyRecursive(src, dest) {
   const stat = fs.statSync(src);
@@ -32,14 +43,46 @@ function removeIfExists(target) {
   }
 }
 
-for (const [from, to] of copies) {
-  const src = path.join(adminDir, from);
-  const dest = path.join(root, to);
-  if (!fs.existsSync(src)) {
-    throw new Error(`Missing admin source path: ${from}`);
+function ensureAdminDir() {
+  if (!fs.existsSync(adminDir)) {
+    throw new Error(
+      `Admin directory not found at ${adminDir}. ` +
+      'Ensure admin/ is committed to git and not excluded by .vercelignore.'
+    );
   }
+}
+
+function copyFromAdmin(relativePath, optional = false) {
+  const src = path.join(adminDir, relativePath);
+  const dest = path.join(root, relativePath);
+
+  if (!fs.existsSync(src)) {
+    if (optional) {
+      if (relativePath === 'next-env.d.ts') {
+        fs.mkdirSync(path.dirname(dest), { recursive: true });
+        fs.writeFileSync(dest, NEXT_ENV_STUB, 'utf8');
+        return;
+      }
+      return;
+    }
+    throw new Error(
+      `Missing admin source path: ${relativePath} (expected at ${src}). ` +
+      'Check that admin/ is included in the Vercel deployment (see .vercelignore).'
+    );
+  }
+
   removeIfExists(dest);
   copyRecursive(src, dest);
+}
+
+ensureAdminDir();
+
+for (const [from] of REQUIRED_COPIES) {
+  copyFromAdmin(from, false);
+}
+
+for (const [from] of OPTIONAL_COPIES) {
+  copyFromAdmin(from, true);
 }
 
 console.log('Prepared Next.js app at repository root for Vercel build.');

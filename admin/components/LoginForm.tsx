@@ -13,11 +13,15 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(
-    errorParam === 'unauthorized'
-      ? 'Your account is not authorized to access the admin dashboard.'
-      : ''
-  );
+  const [error, setError] = useState(() => {
+    if (errorParam === 'unauthorized') {
+      return 'Your account is not authorized to access the admin dashboard.';
+    }
+    if (errorParam === 'config') {
+      return 'Admin is not configured on the server. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel → Settings → Environment Variables, then redeploy.';
+    }
+    return '';
+  });
   const [resetMsg, setResetMsg] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {

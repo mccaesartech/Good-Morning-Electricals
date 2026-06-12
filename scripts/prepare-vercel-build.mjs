@@ -93,4 +93,33 @@ if (!fs.existsSync(clientModule)) {
   );
 }
 
+/** Public marketing site (served from public/ alongside /admin Next.js app). */
+const STATIC_SITE_FILES = ['index.html', 'style.css', 'script.js'];
+const STATIC_SITE_DIRS = ['js', 'assets'];
+
+function copyStaticSite() {
+  const publicDir = path.join(root, 'public');
+  fs.mkdirSync(publicDir, { recursive: true });
+
+  for (const file of STATIC_SITE_FILES) {
+    const src = path.join(root, file);
+    if (!fs.existsSync(src)) {
+      throw new Error(`Static site file missing: ${file} (expected at ${src})`);
+    }
+    fs.copyFileSync(src, path.join(publicDir, file));
+  }
+
+  for (const dir of STATIC_SITE_DIRS) {
+    const src = path.join(root, dir);
+    const dest = path.join(publicDir, dir);
+    if (!fs.existsSync(src)) {
+      throw new Error(`Static site directory missing: ${dir} (expected at ${src})`);
+    }
+    removeIfExists(dest);
+    copyRecursive(src, dest);
+  }
+}
+
+copyStaticSite();
+
 console.log('Prepared Next.js app at repository root for Vercel build.');

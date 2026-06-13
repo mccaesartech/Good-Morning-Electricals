@@ -4,6 +4,8 @@ type EnrolmentRecord = {
   phone: string;
   programme: string;
   message?: string | null;
+  date_of_birth?: string | null;
+  education_level?: string | null;
 };
 
 type EnquiryRecord = {
@@ -13,6 +15,13 @@ type EnquiryRecord = {
   programme?: string | null;
   message?: string | null;
 };
+
+export type EnrolmentNotifyStatus =
+  | 'pending'
+  | 'contacted'
+  | 'admitted'
+  | 'rejected'
+  | 'archived';
 
 function getConfig() {
   return {
@@ -82,51 +91,59 @@ async function sendSms(phone: string, message: string): Promise<boolean> {
   return true;
 }
 
+function enrolmentDetailsHtml(record: EnrolmentRecord): string {
+  return `<ul>
+      <li><strong>Name:</strong> ${record.full_name}</li>
+      <li><strong>Email:</strong> ${record.email}</li>
+      <li><strong>Phone:</strong> ${record.phone}</li>
+      <li><strong>Programme:</strong> ${record.programme}</li>
+      ${record.date_of_birth ? `<li><strong>Date of birth:</strong> ${record.date_of_birth}</li>` : ''}
+      ${record.education_level ? `<li><strong>Education:</strong> ${record.education_level}</li>` : ''}
+      ${record.message ? `<li><strong>Message:</strong> ${record.message}</li>` : ''}
+    </ul>`;
+}
+
 export async function notifyEnrolmentSubmitted(record: EnrolmentRecord) {
   const { full_name: name, email, phone, programme } = record;
   const cfg = getConfig();
 
   const emailSent = await sendEmail(
     email,
-    'Enrolment Application Received — GME Academy',
+    'Enrolment Received — Good Morning Electrical Engineering Academy',
     `<p>Dear ${name},</p>
     <p>Thank you for applying to <strong>Good Morning Electrical Engineering Academy</strong>.</p>
-    <p>Your application for <strong>${programme}</strong> was received successfully.</p>
-    <p><strong>Status: Pending review.</strong> Our admissions team will contact you by phone or email shortly.</p>
+    <p>Your application for <strong>${programme}</strong> has been <strong>received successfully</strong>.</p>
+    <p><strong>Current status: Received (pending review)</strong></p>
+    <p>Our admissions team will review your application and email you when your status changes to contacted, admitted, or not admitted.</p>
     <p>Best regards,<br>Admissions Team<br>Good Morning Electrical Engineering Academy</p>`
   );
 
   const smsSent = await sendSms(
     phone,
-    `GME Academy: Hi ${name}, your enrolment for ${programme} was received. Status: PENDING. We will contact you soon.`
+    `GME Academy: Hi ${name}, your enrolment for ${programme} was RECEIVED. Status: PENDING review. We will contact you soon.`
   );
 
-  await sendEmail(
+  const adminEmailSent = await sendEmail(
     cfg.adminEmail,
     `New Enrolment Application — ${name}`,
-    `<p><strong>New enrolment application</strong></p>
-    <ul>
-      <li>Name: ${name}</li>
-      <li>Email: ${email}</li>
-      <li>Phone: ${phone}</li>
-      <li>Programme: ${programme}</li>
-    </ul>
-    <p>Review in Admin → Enrolments. Status: <strong>pending</strong>.</p>`
+    `<p><strong>New enrolment application received</strong></p>
+    ${enrolmentDetailsHtml(record)}
+    <p>Review in <strong>Admin → Enrolments</strong>. Status: <strong>pending (received)</strong>.</p>`
   );
 
-  return { emailSent, smsSent };
+  return { emailSent, smsSent, adminEmailSent };
 }
 
 export async function notifyEnrolmentStatusChange(
   record: EnrolmentRecord,
-  status: 'contacted' | 'admitted' | 'pending'
+  status: EnrolmentNotifyStatus
 ) {
   const { full_name: name, email, phone, programme } = record;
 
   if (status === 'contacted') {
     await sendEmail(
       email,
-      'Enrolment Update — GME Academy',
+      'Enrolment Update — Contacted — GME Academy',
       `<p>Dear ${name},</p>
       <p>Your enrolment application for <strong>${programme}</strong> has been reviewed.</p>
       <p><strong>Status: Contacted.</strong> Our admissions team has reached out or will contact you shortly with next steps.</p>
@@ -142,10 +159,10 @@ export async function notifyEnrolmentStatusChange(
   if (status === 'admitted') {
     await sendEmail(
       email,
-      'Congratulations — You Have Been Admitted! — GME Academy',
+      'Congratulations — Admitted — GME Academy',
       `<p>Dear ${name},</p>
       <p>Congratulations! You have been <strong>admitted</strong> to <strong>${programme}</strong> at Good Morning Electrical Engineering Academy.</p>
-      <p>Our admissions team will contact you with registration and orientation details.</p>
+      <p><strong>Status: Admitted.</strong> Our admissions team will contact you with registration and orientation details.</p>
       <p>Welcome to GME Academy!</p>`
     );
     await sendSms(
@@ -155,17 +172,45 @@ export async function notifyEnrolmentStatusChange(
     return;
   }
 
-  if (status === 'pending') {
+  if (status === 'rejected') {
     await sendEmail(
       email,
-      'Enrolment Status — Pending — GME Academy',
+      'Enrolment Update — Not Admitted — GME Academy',
       `<p>Dear ${name},</p>
-      <p>Your application for <strong>${programme}</strong> is <strong>pending review</strong>.</p>
-      <p>We will contact you soon.</p>`
+      <p>Thank you for your interest in <strong>${programme}</strong> at Good Morning Electrical Engineering Academy.</p>
+      <p><strong>Status: Not admitted.</strong> After review, we are unable to offer you a place at this time.</p>
+      <p>You may contact our admissions team if you have questions.</p>
+      <p>Good Morning Electrical Engineering Academy</p>`
     );
     await sendSms(
       phone,
-      `GME Academy: Hi ${name}, your ${programme} application status is PENDING review.`
+      `GME Academy: Hi ${name}, your ${programme} application was reviewed. Status: NOT ADMITTED at this time.`
+    );
+    return;
+  }
+
+  if (status === 'archived') {
+    await sendEmail(
+      email,
+      'Enrolment Application Archived — GME Academy',
+      `<p>Dear ${name},</p>
+      <p>Your application for <strong>${programme}</strong> has been <strong>archived</strong> in our records.</p>
+      <p>Contact admissions if you would like to re-apply or need more information.</p>`
+    );
+    return;
+  }
+
+  if (status === 'pending') {
+    await sendEmail(
+      email,
+      'Enrolment Status — Received (Pending Review) — GME Academy',
+      `<p>Dear ${name},</p>
+      <p>Your application for <strong>${programme}</strong> is <strong>received and pending review</strong>.</p>
+      <p>We will contact you when your status is updated.</p>`
+    );
+    await sendSms(
+      phone,
+      `GME Academy: Hi ${name}, your ${programme} application status is RECEIVED — pending review.`
     );
   }
 }

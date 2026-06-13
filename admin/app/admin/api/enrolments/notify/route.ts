@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { notifyEnrolmentStatusChange } from '@/lib/notifications';
+import { notifyEnrolmentStatusChange, type EnrolmentNotifyStatus } from '@/lib/notifications';
+import { requireAdmin } from '@/lib/admin-auth';
 
-async function requireAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data: profile } = await supabase.rpc('get_admin_profile');
-  if (!profile) return null;
-  return { supabase, user, profile };
-}
+const NOTIFY_STATUSES: EnrolmentNotifyStatus[] = [
+  'pending',
+  'contacted',
+  'admitted',
+  'rejected',
+  'archived'
+];
 
 export async function POST(request: Request) {
   const auth = await requireAdmin();
@@ -17,7 +16,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const status = body?.status as 'contacted' | 'admitted' | 'pending';
+    const status = body?.status as EnrolmentNotifyStatus;
     const record = body?.record as {
       full_name: string;
       email: string;
@@ -29,7 +28,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
-    if (!['contacted', 'admitted', 'pending'].includes(status)) {
+    if (!NOTIFY_STATUSES.includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 

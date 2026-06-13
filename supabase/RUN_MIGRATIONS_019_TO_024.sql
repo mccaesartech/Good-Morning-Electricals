@@ -123,3 +123,6 @@ ALTER TABLE gallery
 
 ALTER TABLE hero
   ADD COLUMN IF NOT EXISTS bg_image_focus TEXT NOT NULL DEFAULT 'center center';
+
+-- 027: rejected enrolment status for email notifications
+ALTER TYPE enrolment_status ADD VALUE IF NOT EXISTS 'rejected';

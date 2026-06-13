@@ -44,9 +44,10 @@ const CONFIGS: Record<SubmissionType, Config> = {
     entityLabel: 'enrolment',
     statusOptions: [
       { value: 'all', label: 'All' },
-      { value: 'pending', label: 'Pending' },
+      { value: 'pending', label: 'Pending (Received)' },
       { value: 'contacted', label: 'Contacted' },
       { value: 'admitted', label: 'Admitted' },
+      { value: 'rejected', label: 'Rejected' },
       { value: 'archived', label: 'Archived' }
     ]
   }
@@ -103,7 +104,7 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
       setError(msg);
       toast.error(msg);
     } else {
-      if (type === 'enrolments' && row && ['contacted', 'admitted', 'pending'].includes(status)) {
+      if (type === 'enrolments' && row && ['contacted', 'admitted', 'pending', 'rejected', 'archived'].includes(status)) {
         try {
           await fetch('/admin/api/enrolments/notify', {
             method: 'POST',
@@ -161,9 +162,9 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
       <div className="card" style={{ marginBottom: '1rem' }}>
         {type === 'enrolments' ? (
           <p className="field-hint" style={{ margin: 0 }}>
-            <strong>How enrolment works:</strong> New applications arrive as <strong>Pending</strong> (received successfully).
-            Use <strong>Mark Contacted</strong> after you call or email the applicant, then <strong>Mark Admitted</strong> when accepted.
-            Applicants receive an automatic confirmation email/SMS when they submit (if notifications are configured).
+            <strong>How enrolment works:</strong> New applications arrive as <strong>Pending (Received)</strong>.
+            Change status to <strong>Contacted</strong>, <strong>Admitted</strong>, or <strong>Rejected</strong> — the applicant receives an automatic email (Resend).
+            You receive an admin email when someone new enrolls. Requires <code>RESEND_API_KEY</code> in Vercel.
           </p>
         ) : (
           <p className="field-hint" style={{ margin: 0 }}>
@@ -229,6 +230,10 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
                     {canEdit && type === 'enrolments' && row.status !== 'admitted' && (
                       <button type="button" className="btn btn-primary btn-sm" disabled={saving}
                         onClick={() => updateStatus(row.id, 'admitted')}>Mark Admitted</button>
+                    )}
+                    {canEdit && type === 'enrolments' && row.status !== 'rejected' && row.status !== 'archived' && (
+                      <button type="button" className="btn btn-danger btn-sm" disabled={saving}
+                        onClick={() => updateStatus(row.id, 'rejected')}>Mark Rejected</button>
                     )}
                     {canDelete && (
                       <button type="button" className="btn btn-danger btn-sm" onClick={() => setDeleteTarget(row)}>

@@ -20,7 +20,9 @@ export async function POST(request: Request) {
         email: String(record.email),
         phone: String(record.phone),
         programme: String(record.programme),
-        message: record.message ?? null
+        message: record.message ?? null,
+        date_of_birth: record.date_of_birth ?? null,
+        education_level: record.education_level ?? null
       });
       return NextResponse.json({ ok: true, ...result });
     }

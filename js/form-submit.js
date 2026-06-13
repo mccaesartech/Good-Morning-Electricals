@@ -46,7 +46,14 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: type, record: record })
-    }).catch(function () { /* non-blocking */ });
+    }).then(function (res) {
+      return res.json().then(function (data) {
+        return { ok: res.ok, data: data };
+      });
+    }).catch(function (err) {
+      console.warn('[GME] Notification request failed:', err);
+      return { ok: false, data: null };
+    });
   }
 
   function setLoading(form, loading) {
@@ -105,11 +112,12 @@
           p_message: record.message
         }).then(function () {
           return sendNotification('contact_enquiries', record);
-        }).then(function () {
-          showSuccess(
-            contactForm,
-            'Thank you! Your message was received successfully. We will contact you by phone or email shortly.'
-          );
+        }).then(function (notifyResult) {
+          var msg = 'Thank you! Your message was received successfully. We will contact you by phone or email shortly.';
+          if (notifyResult && notifyResult.ok && notifyResult.data && notifyResult.data.emailSent) {
+            msg = 'Thank you! A confirmation email has been sent to ' + record.email + '. We will contact you shortly.';
+          }
+          showSuccess(contactForm, msg);
         }).catch(function (err) {
           showError(contactForm, err.message || 'Please try again.');
         }).finally(function () {
@@ -144,11 +152,12 @@
           p_message: record.message
         }).then(function () {
           return sendNotification('enrolments', record);
-        }).then(function () {
-          showSuccess(
-            enrolForm,
-            'Application received successfully! Check your email for confirmation. Our team will update you when your application is contacted, admitted, or reviewed.'
-          );
+        }).then(function (notifyResult) {
+          var msg = 'Application received successfully! Our admissions team will review it and contact you soon.';
+          if (notifyResult && notifyResult.ok && notifyResult.data && notifyResult.data.emailSent) {
+            msg = 'Application received successfully! A confirmation email has been sent to ' + record.email + '.';
+          }
+          showSuccess(enrolForm, msg);
         }).catch(function (err) {
           showError(enrolForm, err.message || 'Please try again.');
         }).finally(function () {

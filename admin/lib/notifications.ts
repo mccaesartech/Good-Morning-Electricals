@@ -34,11 +34,14 @@ function getConfig() {
   };
 }
 
-async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+type EmailResult = { sent: boolean; error?: string };
+
+async function sendEmail(to: string, subject: string, html: string): Promise<EmailResult> {
   const cfg = getConfig();
   if (!cfg.resendKey) {
-    console.warn('[notifications] RESEND_API_KEY not set — skipping email to', to);
-    return false;
+    const error = 'RESEND_API_KEY is not set in Vercel environment variables';
+    console.warn('[notifications]', error);
+    return { sent: false, error };
   }
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -50,10 +53,10 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
   });
   if (!res.ok) {
     const err = await res.text();
-    console.error('[notifications] Resend error:', err);
-    return false;
+    console.error('[notifications] Resend error for', to, ':', err);
+    return { sent: false, error: err };
   }
-  return true;
+  return { sent: true };
 }
 
 function formatGhanaPhone(phone: string): string {
@@ -107,7 +110,7 @@ export async function notifyEnrolmentSubmitted(record: EnrolmentRecord) {
   const { full_name: name, email, phone, programme } = record;
   const cfg = getConfig();
 
-  const emailSent = await sendEmail(
+  const applicantEmail = await sendEmail(
     email,
     'Enrolment Received — Good Morning Electrical Engineering Academy',
     `<p>Dear ${name},</p>
@@ -123,7 +126,7 @@ export async function notifyEnrolmentSubmitted(record: EnrolmentRecord) {
     `GME Academy: Hi ${name}, your enrolment for ${programme} was RECEIVED. Status: PENDING review. We will contact you soon.`
   );
 
-  const adminEmailSent = await sendEmail(
+  const adminEmail = await sendEmail(
     cfg.adminEmail,
     `New Enrolment Application — ${name}`,
     `<p><strong>New enrolment application received</strong></p>
@@ -131,7 +134,13 @@ export async function notifyEnrolmentSubmitted(record: EnrolmentRecord) {
     <p>Review in <strong>Admin → Enrolments</strong>. Status: <strong>pending (received)</strong>.</p>`
   );
 
-  return { emailSent, smsSent, adminEmailSent };
+  return {
+    emailSent: applicantEmail.sent,
+    emailError: applicantEmail.error,
+    smsSent,
+    adminEmailSent: adminEmail.sent,
+    adminEmailError: adminEmail.error
+  };
 }
 
 export async function notifyEnrolmentStatusChange(

@@ -11,7 +11,7 @@ const TITLES: Record<string, { title: string; subtitle: string }> = {
   '/faq': { title: 'FAQ', subtitle: 'Manage frequently asked questions' },
   '/facilities': { title: 'Facilities & Practical Training', subtitle: 'Campus workshops, tools, and training spaces' },
   '/hero': { title: 'Hero Section', subtitle: 'Edit homepage hero content' },
-  '/settings': { title: 'Site Settings', subtitle: 'Global site configuration' },
+  '/settings': { title: 'Header, Logo & Settings', subtitle: 'School name beside logo, logo image, footer & SEO' },
   '/contact': { title: 'Contact Info', subtitle: 'Phone, email, and location' },
   '/activity': { title: 'Activity Log', subtitle: 'Admin audit trail' },
   '/enquiries': { title: 'Enquiries', subtitle: 'Contact form submissions' },

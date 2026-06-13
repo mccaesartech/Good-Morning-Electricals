@@ -91,7 +91,7 @@ export default async function DashboardPage() {
               <Link href={adminPath('/enrolments')} className="btn btn-secondary btn-sm">View Enrolments</Link>
             )}
             {hasPermission(perms, 'manage_settings') && (
-              <Link href={adminPath('/settings')} className="btn btn-secondary btn-sm">Site Settings</Link>
+              <Link href={adminPath('/settings')} className="btn btn-secondary btn-sm">Header & Logo</Link>
             )}
           </div>
         </div>

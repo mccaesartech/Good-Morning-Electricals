@@ -40,7 +40,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
   {
     group: 'Settings',
     items: [
-      { href: '/settings', label: 'Site Settings', permission: 'manage_settings' },
+      { href: '/settings', label: 'Header, Logo & Settings', permission: 'manage_settings' },
       { href: '/contact', label: 'Contact Info', permission: 'manage_contact' },
       { href: '/users', label: 'User Management', permission: 'manage_users' }
     ]

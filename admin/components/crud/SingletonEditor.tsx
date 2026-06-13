@@ -14,12 +14,17 @@ import { useToast } from '@/components/ui/ToastProvider';
 export type SingletonField = {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'image' | 'lines' | 'json-lines' | 'json';
+  type: 'text' | 'textarea' | 'select' | 'image' | 'lines' | 'json-lines' | 'json' | 'section';
   rows?: number;
   imageFolder?: string;
   col?: 'full' | 'half';
   placeholder?: string;
+  hint?: string;
 };
+
+function isDataField(field: SingletonField): boolean {
+  return field.type !== 'section';
+}
 
 type SingletonEditorProps = {
   table: string;
@@ -83,6 +88,7 @@ export default function SingletonEditor({
       setRecordId(data.id as string);
       const initial: Record<string, string> = {};
       for (const field of fields) {
+        if (!isDataField(field)) continue;
         const val = data[field.name];
         if (field.type === 'lines' || field.type === 'json-lines') {
           initial[field.name] = linesToString(val);
@@ -113,6 +119,7 @@ export default function SingletonEditor({
 
     const payload: Record<string, unknown> = {};
     for (const field of fields) {
+      if (!isDataField(field)) continue;
       const raw = form[field.name] ?? '';
       if (field.type === 'lines' || field.type === 'json-lines') {
         payload[field.name] = parseLines(raw);
@@ -202,6 +209,15 @@ export default function SingletonEditor({
   }
 
   function renderField(field: SingletonField) {
+    if (field.type === 'section') {
+      return (
+        <div key={field.name} className="form-section-heading form-field--full">
+          <h3>{field.label}</h3>
+          {field.hint && <p className="field-hint">{field.hint}</p>}
+        </div>
+      );
+    }
+
     if (field.type === 'image') {
       return (
         <ImageUpload
@@ -241,6 +257,7 @@ export default function SingletonEditor({
           {field.type === 'json' && (
             <p className="field-hint">JSON array format, e.g. [{`{"number":"500+","label":"Students","count":500}`}]</p>
           )}
+          {field.hint && <p className="field-hint">{field.hint}</p>}
         </div>
       );
     }
@@ -254,7 +271,8 @@ export default function SingletonEditor({
           placeholder={field.placeholder}
           onChange={(e) => setField(field.name, e.target.value)}
         />
-        {field.name === 'bg_image_focus' && (
+        {field.hint && <p className="field-hint">{field.hint}</p>}
+        {field.name === 'bg_image_focus' && !field.hint && (
           <p className="field-hint">Controls which part of the hero photo is visible on phones and tablets. Try center center, 50% 30%, or top center.</p>
         )}
       </div>

@@ -389,6 +389,10 @@
 
     setText(document.getElementById('nav-logo-name'), s.logoLine1);
     setText(document.getElementById('nav-logo-sub'), s.logoLine2);
+    var menuTitle = document.getElementById('nav-menu-title');
+    if (menuTitle) {
+      menuTitle.textContent = [s.logoLine1, s.logoLine2].filter(Boolean).join(' ');
+    }
     setText(document.getElementById('footer-brand-line1'), s.logoLine1);
     setText(document.getElementById('footer-brand-line2'), s.logoLine2);
 

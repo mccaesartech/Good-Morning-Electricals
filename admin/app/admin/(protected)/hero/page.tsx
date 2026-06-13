@@ -10,6 +10,13 @@ const FIELDS = [
   { name: 'cta_secondary', label: 'Secondary Button Text', type: 'text' as const, col: 'half' as const },
   { name: 'bg_image_url', label: 'Background Image', type: 'image' as const, imageFolder: 'hero', col: 'full' as const },
   {
+    name: 'bg_image_focus',
+    label: 'Background Focus (mobile/tablet crop)',
+    type: 'text' as const,
+    col: 'full' as const,
+    placeholder: 'center center'
+  },
+  {
     name: 'statistics',
     label: 'Statistics (JSON array)',
     type: 'json' as const,
@@ -24,7 +31,7 @@ export default function HeroPage() {
     <SingletonEditor
       table="hero"
       title="Hero Section"
-      description="Edit the homepage hero banner, headlines, and call-to-action buttons."
+      description="Edit the homepage hero banner, background image, headlines, and call-to-action buttons. Upload a Background Image here — use Background Focus to control what part of the photo shows on phones and tablets (e.g. center center, 50% 30%, top center)."
       fields={FIELDS}
       entityLabel="Hero Section"
     />

@@ -65,7 +65,8 @@
         panelCta: h.panel_cta || '100% Practical Focus',
         ctaPrimary: h.cta_primary || 'Enroll Today',
         ctaSecondary: h.cta_secondary || 'View Programmes',
-        bgImage: h.bg_image_url || ''
+        bgImage: h.bg_image_url || '',
+        bgFocus: h.bg_image_focus || 'center center'
       },
       statistics: parseJsonArray(h.statistics),
       about: {
@@ -137,7 +138,7 @@
         };
       }),
       gallery: (raw.gallery || []).map(function (g) {
-        return { title: g.caption, image: g.image_url, alt: g.alt_text };
+        return { title: g.caption, image: g.image_url, alt: g.alt_text, captionColor: g.caption_color || '#ffffff' };
       }),
       admissions: {
         title: adm.title || '',
@@ -185,13 +186,28 @@
     return src + sep + 'v=' + encodeURIComponent(version);
   }
 
+  function baseImageSrc(src) {
+    return String(src || '').split('?')[0];
+  }
+
   function setImageSrc(el, src) {
     if (!el || !src) return;
+    var tracked = el.getAttribute('data-image-src');
+    if (tracked === src) return;
+
     if (src.indexOf('assets/logo') !== -1 || src === 'assets/logo.png') {
-      el.src = 'assets/logo.png';
+      if (baseImageSrc(el.src) !== baseImageSrc('assets/logo.png')) {
+        el.src = 'assets/logo.png';
+      }
+      el.setAttribute('data-image-src', src);
       return;
     }
-    el.src = cacheBustUrl(src);
+
+    var next = cacheBustUrl(src);
+    if (baseImageSrc(el.src) !== baseImageSrc(src)) {
+      el.src = next;
+    }
+    el.setAttribute('data-image-src', src);
   }
 
   function mapQuery(loc) {
@@ -229,7 +245,26 @@
       }).join('');
   }
 
+  var lastRenderSnapshot = '';
+
+  function renderGallerySection(grid, items) {
+    if (!grid) return;
+    var fp = JSON.stringify(items);
+    if (grid.getAttribute('data-content-fp') === fp) return;
+    grid.setAttribute('data-content-fp', fp);
+    grid.innerHTML = items.length
+      ? items.map(function (g) {
+        return '<figure class="gallery-item" style="--caption-color:' + esc(g.captionColor || '#ffffff') + '"><img src="' + esc(cacheBustUrl(g.image || FALLBACK_IMAGE)) + '" alt="' + esc(g.alt || g.title) + '" loading="lazy" decoding="async"><figcaption>' + esc(g.title) + '</figcaption></figure>';
+      }).join('')
+      : '';
+  }
+
   function render(data) {
+    var snap = JSON.stringify(data);
+    if (snap === lastRenderSnapshot) return;
+    lastRenderSnapshot = snap;
+    window.GME_lastSnapshot = snap;
+
     var s = data.settings;
 
     if (s.metaTitle) document.title = s.metaTitle;
@@ -283,6 +318,11 @@
     setText(document.getElementById('hero-panel-cta'), h.panelCta);
 
     setImageSrc(document.getElementById('hero-bg-img'), h.bgImage);
+    var heroBgEl = document.getElementById('hero-bg-img');
+    if (heroBgEl && h.bgFocus && heroBgEl.getAttribute('data-bg-focus') !== h.bgFocus) {
+      heroBgEl.setAttribute('data-bg-focus', h.bgFocus);
+      heroBgEl.style.objectPosition = h.bgFocus;
+    }
 
     var heroCtaPrimary = document.querySelector('#hero-cta-primary span');
     if (heroCtaPrimary) heroCtaPrimary.textContent = h.ctaPrimary;
@@ -429,14 +469,7 @@
         : '';
     }
 
-    var galleryGrid = document.getElementById('gallery-grid');
-    if (galleryGrid) {
-      galleryGrid.innerHTML = data.gallery.length
-        ? data.gallery.map(function (g) {
-          return '<figure class="gallery-item reveal visible"><img src="' + esc(cacheBustUrl(g.image || FALLBACK_IMAGE)) + '" alt="' + esc(g.alt || g.title) + '" loading="lazy"><figcaption>' + esc(g.title) + '</figcaption></figure>';
-        }).join('')
-        : '';
-    }
+    renderGallerySection(document.getElementById('gallery-grid'), data.gallery);
 
     var adm = data.admissions;
     setText(document.getElementById('admissions-title'), adm.title);
@@ -562,11 +595,21 @@
     GME_Supabase.loadSiteContent({ force: true })
       .then(function (raw) {
         var data = normalize(raw);
-        if (data) render(data);
+        if (data) {
+          window.GME_lastSnapshot = JSON.stringify(data);
+          render(data);
+        }
       })
       .catch(function (err) {
         console.warn('[GME] Could not load site content from Supabase:', err && err.message ? err.message : err);
       });
+
+    var lastKnownVersion = '0';
+    try {
+      lastKnownVersion = localStorage.getItem('gme_content_version') || '0';
+    } catch (verErr) {
+      lastKnownVersion = '0';
+    }
 
     function onContentPublished() {
       GME_Supabase.refreshSiteContent().catch(function () { /* keep current view */ });
@@ -574,6 +617,7 @@
 
     window.addEventListener('storage', function (e) {
       if (e.key === 'gme_content_version' && e.newValue) {
+        lastKnownVersion = e.newValue;
         onContentPublished();
       }
     });
@@ -582,23 +626,21 @@
       var contentChannel = new BroadcastChannel('gme_content_channel');
       contentChannel.onmessage = function (ev) {
         if (ev.data && ev.data.type === 'content-published') {
+          if (ev.data.version) lastKnownVersion = String(ev.data.version);
           onContentPublished();
         }
       };
     }
 
-    document.addEventListener('visibilitychange', function () {
-      if (!document.hidden) onContentPublished();
-    });
-
-    window.addEventListener('pageshow', function (e) {
-      if (e.persisted) onContentPublished();
-    });
-
     setInterval(function () {
-      if (!document.hidden) {
-        onContentPublished();
-      }
+      if (document.hidden) return;
+      try {
+        var currentVersion = localStorage.getItem('gme_content_version') || '0';
+        if (currentVersion !== lastKnownVersion) {
+          lastKnownVersion = currentVersion;
+          onContentPublished();
+        }
+      } catch (pollErr) { /* ignore */ }
     }, 5000);
   }
 

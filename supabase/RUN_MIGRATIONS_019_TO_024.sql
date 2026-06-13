@@ -116,3 +116,10 @@ UPDATE site_settings SET status = 'published', published_at = COALESCE(published
 
 -- Ensure public RPC is callable
 GRANT EXECUTE ON FUNCTION get_published_site_content() TO anon, authenticated;
+
+-- 026: gallery caption color + hero background focus position
+ALTER TABLE gallery
+  ADD COLUMN IF NOT EXISTS caption_color TEXT NOT NULL DEFAULT '#ffffff';
+
+ALTER TABLE hero
+  ADD COLUMN IF NOT EXISTS bg_image_focus TEXT NOT NULL DEFAULT 'center center';

@@ -79,12 +79,19 @@
     return fetchPublishedContent();
   }
 
+  function applyContentIfChanged(data) {
+    if (!window.GME_normalize || !window.GME_render) return;
+    var normalized = window.GME_normalize(data);
+    if (!normalized) return;
+    var snap = JSON.stringify(normalized);
+    if (snap === window.GME_lastSnapshot) return;
+    window.GME_lastSnapshot = snap;
+    window.GME_render(normalized);
+  }
+
   function refreshSiteContent() {
     return loadSiteContent({ force: true }).then(function (data) {
-      if (window.GME_render && window.GME_normalize) {
-        var normalized = window.GME_normalize(data);
-        if (normalized) window.GME_render(normalized);
-      }
+      applyContentIfChanged(data);
       return data;
     });
   }

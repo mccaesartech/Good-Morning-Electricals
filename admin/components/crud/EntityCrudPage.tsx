@@ -278,6 +278,20 @@ export default function EntityCrudPage({ config, description }: EntityCrudPagePr
       );
     }
 
+    if (field.type === 'color') {
+      return (
+        <div key={field.name} className={`form-field${field.col === 'half' ? ' form-field--half' : ''}`}>
+          <label>{field.label}{field.required && ' *'}</label>
+          <input
+            type="color"
+            value={String(value) || '#ffffff'}
+            onChange={(e) => setField(field.name, e.target.value)}
+          />
+          <p className="field-hint">Color of the caption text shown over the photo on the website.</p>
+        </div>
+      );
+    }
+
     if (field.type === 'textarea' || field.type === 'lines') {
       return (
         <div key={field.name} className={`form-field${field.col === 'half' ? ' form-field--half' : ''}`}>

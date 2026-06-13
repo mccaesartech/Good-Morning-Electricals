@@ -254,6 +254,9 @@ export default function SingletonEditor({
           placeholder={field.placeholder}
           onChange={(e) => setField(field.name, e.target.value)}
         />
+        {field.name === 'bg_image_focus' && (
+          <p className="field-hint">Controls which part of the hero photo is visible on phones and tablets. Try center center, 50% 30%, or top center.</p>
+        )}
       </div>
     );
   }

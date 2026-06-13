@@ -1,4 +1,4 @@
-export type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'image' | 'lines';
+export type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'image' | 'lines' | 'color';
 
 export type FormField = {
   name: string;
@@ -113,12 +113,13 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
     ],
     fields: [
       { name: 'caption', label: 'Caption', type: 'text', required: true, col: 'full', placeholder: 'e.g. Students during workshop practical' },
-      { name: 'alt_text', label: 'Alt Text', type: 'text', col: 'full' },
+      { name: 'caption_color', label: 'Caption Text Color', type: 'color', col: 'half' },
+      { name: 'alt_text', label: 'Alt Text', type: 'text', col: 'half' },
       { name: 'image_url', label: 'Image', type: 'image', imageFolder: 'gallery', required: true, col: 'full' },
       { name: 'sort_order', label: 'Sort Order', type: 'number', col: 'half' },
       { name: 'status', label: 'Status', type: 'select', col: 'half' }
     ],
-    defaultValues: { sort_order: 0, status: 'published', image_url: '' }
+    defaultValues: { sort_order: 0, status: 'published', image_url: '', caption_color: '#ffffff' }
   },
   testimonials: {
     table: 'testimonials',

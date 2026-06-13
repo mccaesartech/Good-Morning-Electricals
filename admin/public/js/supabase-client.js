@@ -22,7 +22,16 @@
     return { url: url, anonKey: anonKey };
   }
 
-  function fetchPublishedContent() {
+  function parseJsonResponse(res) {
+    if (!res.ok) {
+      return res.text().then(function (body) {
+        throw new Error('Content request failed: ' + res.status + (body ? ' ' + body.slice(0, 120) : ''));
+      });
+    }
+    return res.json();
+  }
+
+  function fetchFromSupabaseRpc() {
     var cfg = getConfig();
     if (!cfg.url || !cfg.anonKey) {
       return Promise.reject(new Error('Supabase not configured'));
@@ -40,9 +49,25 @@
         Pragma: 'no-cache'
       },
       body: '{}'
-    }).then(function (res) {
-      if (!res.ok) throw new Error('Supabase RPC failed: ' + res.status);
-      return res.json();
+    }).then(parseJsonResponse);
+  }
+
+  function fetchFromApi() {
+    var version = encodeURIComponent(getContentVersion());
+    return fetch('/api/site-content?_=' + Date.now() + '&v=' + version, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: {
+        Accept: 'application/json',
+        'Cache-Control': 'no-cache, no-store',
+        Pragma: 'no-cache'
+      }
+    }).then(parseJsonResponse);
+  }
+
+  function fetchPublishedContent() {
+    return fetchFromSupabaseRpc().catch(function () {
+      return fetchFromApi();
     });
   }
 
@@ -54,12 +79,19 @@
     return fetchPublishedContent();
   }
 
+  function applyContentIfChanged(data) {
+    if (!window.GME_normalize || !window.GME_render) return;
+    var normalized = window.GME_normalize(data);
+    if (!normalized) return;
+    var snap = JSON.stringify(normalized);
+    if (snap === window.GME_lastSnapshot) return;
+    window.GME_lastSnapshot = snap;
+    window.GME_render(normalized);
+  }
+
   function refreshSiteContent() {
     return loadSiteContent({ force: true }).then(function (data) {
-      if (window.GME_render && window.GME_normalize) {
-        var normalized = window.GME_normalize(data);
-        if (normalized) window.GME_render(normalized);
-      }
+      applyContentIfChanged(data);
       return data;
     });
   }
@@ -68,6 +100,6 @@
     getConfig: getConfig,
     loadSiteContent: loadSiteContent,
     refreshSiteContent: refreshSiteContent,
-    clearCache: function () { /* no-op — cache removed for live sync */ }
+    clearCache: function () { /* no-op */ }
   };
 })();

@@ -2287,3 +2287,43 @@ address { font-style: normal; }
     margin: 0;
   }
 }
+
+/* CMS boot — hide stale placeholder HTML until cached/live content is applied */
+html.cms-loading body > *:not(.cms-boot-splash) {
+  visibility: hidden;
+}
+
+.cms-boot-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #071d3f 0%, #0b2c5f 100%);
+}
+
+.cms-boot-splash__logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  animation: none;
+  transform: none;
+}
+
+html.cms-ready .cms-boot-splash {
+  display: none;
+}
+
+html.cms-ready body > * {
+  visibility: visible;
+}
+
+@keyframes cmsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+html.cms-ready body {
+  animation: cmsFadeIn 0.2s ease;
+}

@@ -72,10 +72,6 @@
   }
 
   function loadSiteContent(options) {
-    var force = !options || options.force !== false;
-    if (!force) {
-      return fetchPublishedContent();
-    }
     return fetchPublishedContent();
   }
 
@@ -87,6 +83,7 @@
     if (snap === window.GME_lastSnapshot) return;
     window.GME_lastSnapshot = snap;
     window.GME_render(normalized);
+    if (window.GME_saveContentCache) window.GME_saveContentCache(data);
   }
 
   function refreshSiteContent() {
@@ -100,6 +97,10 @@
     getConfig: getConfig,
     loadSiteContent: loadSiteContent,
     refreshSiteContent: refreshSiteContent,
-    clearCache: function () { /* no-op */ }
+    clearCache: function () {
+      try {
+        localStorage.removeItem('gme_content_cache');
+      } catch (e) { /* ignore */ }
+    }
   };
 })();

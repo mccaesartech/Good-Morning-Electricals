@@ -2,6 +2,73 @@
   'use strict';
 
   var FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80';
+  var CONTENT_CACHE_KEY = 'gme_content_cache';
+  var VERSION_KEY = 'gme_content_version';
+  var cmsReadyMarked = false;
+  var preloadedImageUrls = {};
+
+  function saveContentCache(raw) {
+    if (!raw) return;
+    try {
+      localStorage.setItem(CONTENT_CACHE_KEY, JSON.stringify(raw));
+    } catch (e) { /* quota / private mode */ }
+  }
+
+  function loadContentCache() {
+    try {
+      var raw = localStorage.getItem(CONTENT_CACHE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function markCmsReady() {
+    if (cmsReadyMarked) return;
+    cmsReadyMarked = true;
+    document.documentElement.classList.remove('cms-loading');
+    document.documentElement.classList.add('cms-ready');
+    var splash = document.querySelector('.cms-boot-splash');
+    if (splash) splash.setAttribute('aria-hidden', 'true');
+  }
+
+  function preloadImage(src) {
+    if (!src || src.indexOf('http') !== 0 || preloadedImageUrls[src]) return;
+    preloadedImageUrls[src] = true;
+    var img = new Image();
+    img.decoding = 'async';
+    img.src = cacheBustUrl(src);
+  }
+
+  function preloadContentImages(data) {
+    if (!data) return;
+    if (data.settings) {
+      preloadImage(data.settings.logo);
+      preloadImage(data.settings.favicon);
+      preloadImage(data.settings.ogImage);
+    }
+    if (data.hero && data.hero.bgImage) preloadImage(data.hero.bgImage);
+    if (data.about && data.about.image) preloadImage(data.about.image);
+    if (data.admissions && data.admissions.bgImage) preloadImage(data.admissions.bgImage);
+    (data.gallery || []).forEach(function (g) { preloadImage(g.image); });
+    (data.programmes || []).forEach(function (p) { preloadImage(p.image); });
+    (data.facilities || []).forEach(function (f) { preloadImage(f.image); });
+    (data.staff || []).forEach(function (st) { preloadImage(st.image); });
+  }
+
+  function applyRawContent(raw, options) {
+    var data = normalize(raw);
+    if (!data) return false;
+    var snap = JSON.stringify(data);
+    if (snap !== window.GME_lastSnapshot) {
+      window.GME_lastSnapshot = snap;
+      render(data);
+    }
+    preloadContentImages(data);
+    if (!options || options.persist !== false) saveContentCache(raw);
+    return true;
+  }
 
   function esc(s) {
     if (s == null) return '';
@@ -176,13 +243,14 @@
 
   function cacheBustUrl(src) {
     if (!src || src.indexOf('http') !== 0) return src;
-    var sep = src.indexOf('?') >= 0 ? '&' : '?';
     var version = '0';
     try {
-      version = localStorage.getItem('gme_content_version') || String(Date.now());
+      version = localStorage.getItem(VERSION_KEY) || '0';
     } catch (e) {
-      version = String(Date.now());
+      version = '0';
     }
+    if (version === '0') return src;
+    var sep = src.indexOf('?') >= 0 ? '&' : '?';
     return src + sep + 'v=' + encodeURIComponent(version);
   }
 
@@ -251,10 +319,34 @@
     if (!grid) return;
     var fp = JSON.stringify(items);
     if (grid.getAttribute('data-content-fp') === fp) return;
+
+    var existing = grid.querySelectorAll('.gallery-item');
+    if (existing.length === items.length && items.length > 0) {
+      for (var gi = 0; gi < items.length; gi++) {
+        var g = items[gi];
+        var fig = existing[gi];
+        var img = fig.querySelector('img');
+        var cap = fig.querySelector('figcaption');
+        var imageSrc = g.image || FALLBACK_IMAGE;
+        fig.style.setProperty('--caption-color', g.captionColor || '#ffffff');
+        if (img) {
+          if (img.getAttribute('data-image-src') !== imageSrc) {
+            img.setAttribute('data-image-src', imageSrc);
+            img.src = cacheBustUrl(imageSrc);
+            img.alt = g.alt || g.title || '';
+          }
+        }
+        if (cap && cap.textContent !== (g.title || '')) cap.textContent = g.title || '';
+      }
+      grid.setAttribute('data-content-fp', fp);
+      return;
+    }
+
     grid.setAttribute('data-content-fp', fp);
     grid.innerHTML = items.length
       ? items.map(function (g) {
-        return '<figure class="gallery-item" style="--caption-color:' + esc(g.captionColor || '#ffffff') + '"><img src="' + esc(cacheBustUrl(g.image || FALLBACK_IMAGE)) + '" alt="' + esc(g.alt || g.title) + '" loading="lazy" decoding="async"><figcaption>' + esc(g.title) + '</figcaption></figure>';
+        var imageSrc = g.image || FALLBACK_IMAGE;
+        return '<figure class="gallery-item" style="--caption-color:' + esc(g.captionColor || '#ffffff') + '"><img src="' + esc(cacheBustUrl(imageSrc)) + '" data-image-src="' + esc(imageSrc) + '" alt="' + esc(g.alt || g.title) + '" loading="lazy" decoding="async"><figcaption>' + esc(g.title) + '</figcaption></figure>';
       }).join('')
       : '';
   }
@@ -585,24 +677,37 @@
     populateProgrammeSelect(document.getElementById('programme'), data.programmes);
     populateProgrammeSelect(document.getElementById('enrol-programme'), data.programmes);
 
+    preloadContentImages(data);
+
     if (window.GME_initReveal) window.GME_initReveal();
     if (window.GME_initStats) window.GME_initStats();
+    markCmsReady();
   }
 
   function bootSiteContent() {
     if (!window.GME_Supabase) return;
 
+    var cachedRaw = loadContentCache();
+    if (cachedRaw) {
+      applyRawContent(cachedRaw, { persist: false });
+      markCmsReady();
+    }
+
     GME_Supabase.loadSiteContent({ force: true })
       .then(function (raw) {
-        var data = normalize(raw);
-        if (data) {
-          window.GME_lastSnapshot = JSON.stringify(data);
-          render(data);
+        if (!raw) {
+          markCmsReady();
+          return;
         }
+        applyRawContent(raw, { persist: true });
+        markCmsReady();
       })
       .catch(function (err) {
         console.warn('[GME] Could not load site content from Supabase:', err && err.message ? err.message : err);
+        markCmsReady();
       });
+
+    setTimeout(markCmsReady, 12000);
 
     var lastKnownVersion = '0';
     try {
@@ -652,5 +757,6 @@
 
   window.GME_render = render;
   window.GME_normalize = normalize;
+  window.GME_saveContentCache = saveContentCache;
   window.GME_FALLBACK_IMAGE = FALLBACK_IMAGE;
 })();

@@ -684,7 +684,7 @@
           <h2 class="section__title" id="enrol-heading">Enrol Now</h2>
           <p class="section__desc">Complete the form below to apply. Our admissions team will contact you shortly.</p>
         </div>
-        <form class="enrol__form reveal" id="enrol-form" novalidate>
+        <form class="enrol__form" id="enrol-form" novalidate>
           <div class="enrol__grid">
             <div class="form-group">
               <label for="enrol-name">Full Name <span aria-hidden="true">*</span></label>
@@ -878,5 +878,11 @@
   <script src="js/site-data.js?v=9"></script>
   <script src="js/form-submit.js?v=6"></script>
   <script src="script.js?v=8"></script>
+  <script>
+    setTimeout(function () {
+      document.documentElement.classList.remove('cms-loading');
+      document.documentElement.classList.add('cms-ready');
+    }, 5000);
+  </script>
 </body>
 </html>

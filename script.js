@@ -124,6 +124,12 @@
     }
   });
 
+  window.addEventListener('resize', function () {
+    if (window.innerWidth >= 768 && navMenu.classList.contains('active')) {
+      closeMenu();
+    }
+  });
+
   window.addEventListener('scroll', function () {
     const scrollY = window.scrollY;
 

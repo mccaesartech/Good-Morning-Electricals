@@ -700,12 +700,18 @@
   }
 
   function bootSiteContent() {
-    if (!window.GME_Supabase) return;
+    setTimeout(markCmsReady, 4000);
 
     var cachedRaw = loadContentCache();
     if (cachedRaw) {
       applyRawContent(cachedRaw, { persist: false });
       markCmsReady();
+    }
+
+    if (!window.GME_Supabase) {
+      console.warn('[GME] Supabase client not loaded — showing static page.');
+      markCmsReady();
+      return;
     }
 
     GME_Supabase.loadSiteContent({ force: true })
@@ -722,7 +728,7 @@
         markCmsReady();
       });
 
-    setTimeout(markCmsReady, 12000);
+    setTimeout(markCmsReady, 4000);
 
     var heroResizeTimer;
     window.addEventListener('resize', function () {

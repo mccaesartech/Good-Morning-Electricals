@@ -29,23 +29,78 @@
     yearEl.textContent = new Date().getFullYear();
   }
 
+  function closeMenu() {
+    navToggle.classList.remove('active');
+    navMenu.classList.remove('active');
+    navMenu.classList.remove('is-dragging');
+    navMenu.style.transform = '';
+    navMenu.style.transition = '';
+    overlay.classList.remove('active');
+    navToggle.setAttribute('aria-expanded', 'false');
+    navToggle.setAttribute('aria-label', 'Open navigation menu');
+    document.body.style.overflow = '';
+  }
+
   function openMenu() {
     navToggle.classList.add('active');
     navMenu.classList.add('active');
+    navMenu.style.transform = '';
+    navMenu.style.transition = '';
     overlay.classList.add('active');
     navToggle.setAttribute('aria-expanded', 'true');
     navToggle.setAttribute('aria-label', 'Close navigation menu');
     document.body.style.overflow = 'hidden';
   }
 
-  function closeMenu() {
-    navToggle.classList.remove('active');
-    navMenu.classList.remove('active');
-    overlay.classList.remove('active');
-    navToggle.setAttribute('aria-expanded', 'false');
-    navToggle.setAttribute('aria-label', 'Open navigation menu');
-    document.body.style.overflow = '';
+  function setupMenuSwipe(target) {
+    var startX = 0;
+    var startY = 0;
+    var dragging = false;
+
+    target.addEventListener('touchstart', function (e) {
+      if (!navMenu.classList.contains('active')) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      dragging = true;
+    }, { passive: true });
+
+    target.addEventListener('touchmove', function (e) {
+      if (!dragging || !navMenu.classList.contains('active')) return;
+      var deltaX = e.touches[0].clientX - startX;
+      var deltaY = e.touches[0].clientY - startY;
+      if (Math.abs(deltaX) < Math.abs(deltaY)) return;
+      if (deltaX > 0) {
+        navMenu.classList.add('is-dragging');
+        navMenu.style.transform = 'translateX(' + deltaX + 'px)';
+      }
+    }, { passive: true });
+
+    function endSwipe(endX) {
+      if (!dragging) return;
+      dragging = false;
+      var deltaX = endX - startX;
+      navMenu.classList.remove('is-dragging');
+      navMenu.style.transition = '';
+      if (Math.abs(deltaX) > 60) {
+        closeMenu();
+        return;
+      }
+      navMenu.style.transform = '';
+    }
+
+    target.addEventListener('touchend', function (e) {
+      endSwipe(e.changedTouches[0].clientX);
+    }, { passive: true });
+
+    target.addEventListener('touchcancel', function () {
+      dragging = false;
+      navMenu.classList.remove('is-dragging');
+      navMenu.style.transform = '';
+    }, { passive: true });
   }
+
+  setupMenuSwipe(navMenu);
+  setupMenuSwipe(overlay);
 
   navToggle.addEventListener('click', function () {
     if (navMenu.classList.contains('active')) {

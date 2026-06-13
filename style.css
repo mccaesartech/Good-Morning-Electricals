@@ -435,6 +435,10 @@ address { font-style: normal; }
     transform: translateX(0);
   }
 
+  .nav__menu.is-dragging {
+    transition: none;
+  }
+
   .nav__menu > li {
     width: 100%;
     margin: 0;
@@ -442,28 +446,60 @@ address { font-style: normal; }
   }
 
   .nav__menu-header {
-    padding: calc(var(--header-height) + 1.25rem) 1.5rem 1.5rem;
+    padding: calc(var(--header-height) + 0.75rem) 1.25rem 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(135deg, rgba(201, 162, 39, 0.14) 0%, transparent 70%);
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.1) 0%, transparent 70%);
+  }
+
+  .nav__menu-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .nav__menu-logo {
+    width: 36px;
+    height: 36px;
+    max-width: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .nav__menu-brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  .nav__menu-name {
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav__menu-sub {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.78);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .nav__menu-eyebrow {
     display: block;
+    margin-top: 0.75rem;
     font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--secondary-light);
-    margin-bottom: 0.35rem;
-  }
-
-  .nav__menu-title {
-    display: block;
-    font-family: var(--font-heading);
-    font-size: 1.125rem;
-    font-weight: 700;
-    line-height: 1.35;
-    color: var(--white);
   }
 
   .nav__menu > li:not(.nav__menu-header):not(.nav__menu-cta) {

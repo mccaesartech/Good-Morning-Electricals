@@ -288,15 +288,11 @@
 
     setImageSrc(heroBgEl, h.bgImage);
 
-    var isPhone = window.matchMedia('(max-width: 767px)').matches;
-    if (!isPhone && h.bgFocus) {
-      if (heroBgEl.getAttribute('data-bg-focus') !== h.bgFocus) {
-        heroBgEl.setAttribute('data-bg-focus', h.bgFocus);
-        heroBgEl.style.objectPosition = h.bgFocus;
-      }
-    } else {
-      heroBgEl.removeAttribute('data-bg-focus');
-      heroBgEl.style.removeProperty('object-position');
+    var focus = h.bgFocus || 'center center';
+    if (heroBgEl.getAttribute('data-bg-focus') !== focus) {
+      heroBgEl.setAttribute('data-bg-focus', focus);
+      heroBgEl.style.setProperty('--hero-bg-position', focus);
+      heroBgEl.style.objectPosition = focus;
     }
   }
 

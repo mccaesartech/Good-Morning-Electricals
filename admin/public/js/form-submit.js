@@ -147,7 +147,7 @@
         }).then(function () {
           showSuccess(
             enrolForm,
-            'Application submitted successfully! A confirmation email and SMS will be sent to you shortly. Our admissions team will review your application (status: Pending) and contact you soon.'
+            'Application received successfully! Check your email for confirmation. Our team will update you when your application is contacted, admitted, or reviewed.'
           );
         }).catch(function (err) {
           showError(enrolForm, err.message || 'Please try again.');

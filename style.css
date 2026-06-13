@@ -2379,11 +2379,15 @@ address { font-style: normal; }
   .nav__toggle { display: none; }
 
   .nav__menu-header,
-  .nav__link-arrow {
+  .nav__menu-item--mobile,
+  .nav__link-arrow,
+  .nav__link-cta-icon {
     display: none;
   }
 
   .nav__menu {
+    display: flex;
+    flex-wrap: nowrap;
     position: static;
     width: auto;
     height: auto;

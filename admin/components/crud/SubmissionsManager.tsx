@@ -162,14 +162,16 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
       <div className="card" style={{ marginBottom: '1rem' }}>
         {type === 'enrolments' ? (
           <p className="field-hint" style={{ margin: 0 }}>
-            <strong>How enrolment works:</strong> New applications arrive as <strong>Pending (Received)</strong>.
-            Change status to <strong>Contacted</strong>, <strong>Admitted</strong>, or <strong>Rejected</strong> — the applicant receives an automatic email (Resend).
-            You receive an admin email when someone new enrolls. Requires <code>RESEND_API_KEY</code> in Vercel.
+            <strong>How enrolment works:</strong> When someone submits the <strong>Enrol Now</strong> form on the website,
+            their application is saved here as <strong>Pending (Received)</strong>, they receive a confirmation email,
+            and you receive an admin alert email. Requires <code>RESEND_API_KEY</code>, <code>FROM_EMAIL</code>,
+            and <code>ADMIN_NOTIFICATION_EMAIL</code> in Vercel. Change status to <strong>Contacted</strong>,{' '}
+            <strong>Admitted</strong>, or <strong>Rejected</strong> to email the applicant again.
           </p>
         ) : (
           <p className="field-hint" style={{ margin: 0 }}>
-            <strong>Enquiries:</strong> New messages start as <strong>New</strong>. Mark <strong>Contacted</strong> once you have replied.
-            Applicants receive a confirmation email when they submit (if notifications are configured).
+            <strong>Enquiries:</strong> Messages from the <strong>Contact Us</strong> form appear here as <strong>New</strong>.
+            The visitor and admin both receive an email on submit (when Resend is configured). Mark <strong>Contacted</strong> once you have replied.
           </p>
         )}
       </div>

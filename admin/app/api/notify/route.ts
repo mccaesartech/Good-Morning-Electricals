@@ -28,14 +28,14 @@ export async function POST(request: Request) {
     }
 
     if (type === 'enquiry') {
-      await notifyEnquirySubmitted({
+      const result = await notifyEnquirySubmitted({
         full_name: String(record.full_name),
         email: String(record.email),
         phone: record.phone ?? null,
         programme: record.programme ?? null,
         message: record.message ?? null
       });
-      return NextResponse.json({ ok: true });
+      return NextResponse.json({ ok: true, ...result });
     }
 
     return NextResponse.json({ error: 'Unknown notification type' }, { status: 400 });

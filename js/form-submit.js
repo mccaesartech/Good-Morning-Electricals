@@ -1,58 +1,21 @@
 /**
- * Public form submissions → Supabase RPC (no SDK required)
+ * Public form submissions → server API (save + email in one step)
  */
 (function () {
   'use strict';
 
-  function getConfig() {
-    var cfg = window.GME_SUPABASE || {};
-    var url = (cfg.url || '').trim();
-    var anonKey = (cfg.anonKey || '').trim();
-    var urlMeta = document.querySelector('meta[name="gme-supabase-url"]');
-    var keyMeta = document.querySelector('meta[name="gme-supabase-anon-key"]');
-    if (urlMeta && urlMeta.content) url = urlMeta.content.trim();
-    if (keyMeta && keyMeta.content) anonKey = keyMeta.content.trim();
-    return { url: url, anonKey: anonKey };
-  }
-
-  function callRpc(fn, params) {
-    var cfg = getConfig();
-    if (!cfg.url || !cfg.anonKey) {
-      return Promise.reject(new Error('Supabase not configured'));
-    }
-    var endpoint = cfg.url.replace(/\/$/, '') + '/rest/v1/rpc/' + fn;
-    return fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        apikey: cfg.anonKey,
-        Authorization: 'Bearer ' + cfg.anonKey,
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify(params)
-    }).then(function (res) {
-      if (!res.ok) {
-        return res.json().then(function (j) {
-          throw new Error(j.message || j.error || 'Submission failed');
-        });
-      }
-      return res.json();
-    });
-  }
-
-  function sendNotification(table, record) {
-    var type = table === 'enrolments' ? 'enrolment' : 'enquiry';
-    return fetch('/api/notify', {
+  function postJson(url, record) {
+    return fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: type, record: record })
+      body: JSON.stringify(record)
     }).then(function (res) {
       return res.json().then(function (data) {
-        return { ok: res.ok, data: data };
+        if (!res.ok) {
+          throw new Error(data.error || 'Submission failed');
+        }
+        return data;
       });
-    }).catch(function (err) {
-      console.warn('[GME] Notification request failed:', err);
-      return { ok: false, data: null };
     });
   }
 
@@ -90,6 +53,33 @@
     if (ok) ok.hidden = true;
   }
 
+  function buildSuccessMessage(result, record, formType) {
+    var applicantEmail = record.email;
+    var parts = [];
+
+    if (formType === 'enrolment') {
+      parts.push('Your application has been received and saved.');
+    } else {
+      parts.push('Your message has been received and saved.');
+    }
+
+    if (result.emailSent) {
+      parts.push('A confirmation email was sent to ' + applicantEmail + '.');
+    }
+
+    if (result.adminEmailSent) {
+      parts.push('Our admissions team has been notified.');
+    } else if (result.saved) {
+      parts.push('Our team will follow up with you shortly.');
+    }
+
+    if (result.saved && !result.emailSent) {
+      parts.push('(Email confirmation could not be delivered — please check your email address or contact us directly.)');
+    }
+
+    return parts.join(' ');
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     var contactForm = document.getElementById('contact-form');
     if (contactForm) {
@@ -104,25 +94,16 @@
           programme: contactForm.querySelector('[name="programme"]').value.trim() || null,
           message: contactForm.querySelector('[name="message"]').value.trim()
         };
-        callRpc('submit_contact_enquiry', {
-          p_full_name: record.full_name,
-          p_email: record.email,
-          p_phone: record.phone,
-          p_programme: record.programme,
-          p_message: record.message
-        }).then(function () {
-          return sendNotification('contact_enquiries', record);
-        }).then(function (notifyResult) {
-          var msg = 'Thank you! Your message was received successfully. We will contact you by phone or email shortly.';
-          if (notifyResult && notifyResult.ok && notifyResult.data && notifyResult.data.emailSent) {
-            msg = 'Thank you! A confirmation email has been sent to ' + record.email + '. We will contact you shortly.';
-          }
-          showSuccess(contactForm, msg);
-        }).catch(function (err) {
-          showError(contactForm, err.message || 'Please try again.');
-        }).finally(function () {
-          setLoading(contactForm, false);
-        });
+        postJson('/api/submit/enquiry', record)
+          .then(function (result) {
+            showSuccess(contactForm, buildSuccessMessage(result, record, 'enquiry'));
+          })
+          .catch(function (err) {
+            showError(contactForm, err.message || 'Please try again.');
+          })
+          .finally(function () {
+            setLoading(contactForm, false);
+          });
       });
     }
 
@@ -142,27 +123,16 @@
           education_level: enrolForm.querySelector('[name="education_level"]').value.trim() || null,
           message: enrolForm.querySelector('[name="message"]').value.trim() || null
         };
-        callRpc('submit_enrolment', {
-          p_full_name: record.full_name,
-          p_email: record.email,
-          p_phone: record.phone,
-          p_programme: record.programme,
-          p_date_of_birth: record.date_of_birth,
-          p_education_level: record.education_level,
-          p_message: record.message
-        }).then(function () {
-          return sendNotification('enrolments', record);
-        }).then(function (notifyResult) {
-          var msg = 'Application received successfully! Our admissions team will review it and contact you soon.';
-          if (notifyResult && notifyResult.ok && notifyResult.data && notifyResult.data.emailSent) {
-            msg = 'Application received successfully! A confirmation email has been sent to ' + record.email + '.';
-          }
-          showSuccess(enrolForm, msg);
-        }).catch(function (err) {
-          showError(enrolForm, err.message || 'Please try again.');
-        }).finally(function () {
-          setLoading(enrolForm, false);
-        });
+        postJson('/api/submit/enrolment', record)
+          .then(function (result) {
+            showSuccess(enrolForm, buildSuccessMessage(result, record, 'enrolment'));
+          })
+          .catch(function (err) {
+            showError(enrolForm, err.message || 'Please try again.');
+          })
+          .finally(function () {
+            setLoading(enrolForm, false);
+          });
       });
     }
 

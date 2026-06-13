@@ -228,7 +228,7 @@ export async function notifyEnquirySubmitted(record: EnquiryRecord) {
   const { full_name: name, email, phone, programme, message } = record;
   const cfg = getConfig();
 
-  await sendEmail(
+  const applicantEmail = await sendEmail(
     email,
     'Message Received — GME Academy',
     `<p>Dear ${name},</p>
@@ -236,20 +236,30 @@ export async function notifyEnquirySubmitted(record: EnquiryRecord) {
     <p>We received your message and will respond by phone or email shortly.</p>`
   );
 
-  await sendEmail(
+  const adminEmail = await sendEmail(
     cfg.adminEmail,
     `New Contact Enquiry — ${name}`,
     `<p><strong>New contact message</strong></p>
     <ul>
-      <li>Name: ${name}</li>
-      <li>Email: ${email}</li>
-      <li>Phone: ${phone ?? '—'}</li>
-      <li>Programme: ${programme ?? '—'}</li>
+      <li><strong>Name:</strong> ${name}</li>
+      <li><strong>Email:</strong> ${email}</li>
+      <li><strong>Phone:</strong> ${phone ?? '—'}</li>
+      <li><strong>Programme:</strong> ${programme ?? '—'}</li>
     </ul>
-    <p><strong>Message:</strong><br>${message ?? '—'}</p>`
+    <p><strong>Message:</strong><br>${message ?? '—'}</p>
+    <p>Review in <strong>Admin → Enquiries</strong>.</p>`
   );
 
+  let smsSent = false;
   if (phone) {
-    await sendSms(phone, `GME Academy: Hi ${name}, we received your enquiry. Our team will contact you shortly.`);
+    smsSent = await sendSms(phone, `GME Academy: Hi ${name}, we received your enquiry. Our team will contact you shortly.`);
   }
+
+  return {
+    emailSent: applicantEmail.sent,
+    emailError: applicantEmail.error,
+    adminEmailSent: adminEmail.sent,
+    adminEmailError: adminEmail.error,
+    smsSent
+  };
 }

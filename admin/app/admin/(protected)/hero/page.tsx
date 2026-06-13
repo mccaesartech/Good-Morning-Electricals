@@ -11,10 +11,11 @@ const FIELDS = [
   { name: 'bg_image_url', label: 'Background Image', type: 'image' as const, imageFolder: 'hero', col: 'full' as const },
   {
     name: 'bg_image_focus',
-    label: 'Background Focus (mobile/tablet crop)',
+    label: 'Background Focus (desktop & tablet)',
     type: 'text' as const,
     col: 'full' as const,
-    placeholder: 'center center'
+    placeholder: 'center center',
+    hint: 'Fine-tune the crop on larger screens only. Phones automatically zoom out to show more of the photo (not just a close-up). Try: center 40%, 50% 35%, or top center.'
   },
   {
     name: 'statistics',

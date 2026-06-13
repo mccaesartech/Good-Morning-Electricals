@@ -278,6 +278,28 @@
     el.setAttribute('data-image-src', src);
   }
 
+  var lastHeroSettings = null;
+
+  function applyHeroBackground(h) {
+    if (!h) return;
+    lastHeroSettings = h;
+    var heroBgEl = document.getElementById('hero-bg-img');
+    if (!heroBgEl) return;
+
+    setImageSrc(heroBgEl, h.bgImage);
+
+    var isPhone = window.matchMedia('(max-width: 767px)').matches;
+    if (!isPhone && h.bgFocus) {
+      if (heroBgEl.getAttribute('data-bg-focus') !== h.bgFocus) {
+        heroBgEl.setAttribute('data-bg-focus', h.bgFocus);
+        heroBgEl.style.objectPosition = h.bgFocus;
+      }
+    } else {
+      heroBgEl.removeAttribute('data-bg-focus');
+      heroBgEl.style.removeProperty('object-position');
+    }
+  }
+
   function mapQuery(loc) {
     if (loc.lat != null && loc.lng != null && !isNaN(loc.lat) && !isNaN(loc.lng)) {
       return String(loc.lat) + ',' + String(loc.lng);
@@ -413,12 +435,7 @@
     setText(document.getElementById('hero-tagline'), s.tagline);
     setText(document.getElementById('hero-panel-cta'), h.panelCta);
 
-    setImageSrc(document.getElementById('hero-bg-img'), h.bgImage);
-    var heroBgEl = document.getElementById('hero-bg-img');
-    if (heroBgEl && h.bgFocus && heroBgEl.getAttribute('data-bg-focus') !== h.bgFocus) {
-      heroBgEl.setAttribute('data-bg-focus', h.bgFocus);
-      heroBgEl.style.objectPosition = h.bgFocus;
-    }
+    applyHeroBackground(h);
 
     var heroCtaPrimary = document.querySelector('#hero-cta-primary span');
     if (heroCtaPrimary) heroCtaPrimary.textContent = h.ctaPrimary;
@@ -712,6 +729,14 @@
       });
 
     setTimeout(markCmsReady, 12000);
+
+    var heroResizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(heroResizeTimer);
+      heroResizeTimer = setTimeout(function () {
+        if (lastHeroSettings) applyHeroBackground(lastHeroSettings);
+      }, 150);
+    });
 
     var lastKnownVersion = '0';
     try {

@@ -1,3 +1,5 @@
+import { sendEmail, type EmailResult } from '@/lib/email';
+
 type EnrolmentRecord = {
   full_name: string;
   email: string;
@@ -25,8 +27,6 @@ export type EnrolmentNotifyStatus =
 
 function getConfig() {
   return {
-    resendKey: process.env.RESEND_API_KEY?.trim() ?? '',
-    fromEmail: process.env.FROM_EMAIL?.trim() ?? 'GME Academy <onboarding@resend.dev>',
     adminEmail: process.env.ADMIN_NOTIFICATION_EMAIL?.trim() ?? 'goodmorningelectricals934@gmail.com',
     atUsername: process.env.AT_USERNAME?.trim() ?? '',
     atApiKey: process.env.AT_API_KEY?.trim() ?? '',
@@ -34,30 +34,8 @@ function getConfig() {
   };
 }
 
-type EmailResult = { sent: boolean; error?: string };
-
-async function sendEmail(to: string, subject: string, html: string): Promise<EmailResult> {
-  const cfg = getConfig();
-  if (!cfg.resendKey) {
-    const error = 'RESEND_API_KEY is not set in Vercel environment variables';
-    console.warn('[notifications]', error);
-    return { sent: false, error };
-  }
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${cfg.resendKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ from: cfg.fromEmail, to: [to], subject, html })
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    console.error('[notifications] Resend error for', to, ':', err);
-    return { sent: false, error: err };
-  }
-  return { sent: true };
-}
+// Re-export for any legacy imports
+export type { EmailResult };
 
 function formatGhanaPhone(phone: string): string {
   const digits = phone.replace(/\D/g, '');

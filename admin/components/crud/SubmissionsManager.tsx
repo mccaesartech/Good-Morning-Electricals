@@ -162,11 +162,9 @@ export default function SubmissionsManager({ type }: { type: SubmissionType }) {
       <div className="card" style={{ marginBottom: '1rem' }}>
         {type === 'enrolments' ? (
           <p className="field-hint" style={{ margin: 0 }}>
-            <strong>How enrolment works:</strong> When someone submits the <strong>Enrol Now</strong> form on the website,
-            their application is saved here as <strong>Pending (Received)</strong>, they receive a confirmation email,
-            and you receive an admin alert email. Requires <code>RESEND_API_KEY</code>, <code>FROM_EMAIL</code>,
-            and <code>ADMIN_NOTIFICATION_EMAIL</code> in Vercel. Change status to <strong>Contacted</strong>,{' '}
-            <strong>Admitted</strong>, or <strong>Rejected</strong> to email the applicant again.
+            <strong>How enrolment works:</strong> Submit on the website → saved here → applicant + admin emails sent.
+            For email without a domain, set <code>GMAIL_USER</code> and <code>GMAIL_APP_PASSWORD</code> in Vercel
+            (Google App Password). Optional: <code>RESEND_API_KEY</code> after you verify a domain.
           </p>
         ) : (
           <p className="field-hint" style={{ margin: 0 }}>

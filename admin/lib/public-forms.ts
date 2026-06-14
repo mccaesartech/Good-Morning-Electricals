@@ -1,4 +1,5 @@
 import { createServiceClient } from '@/lib/supabase/service';
+import { getSupabaseAnonKey, getSupabaseUrl } from '@/lib/supabase/env';
 import { notifyEnquirySubmitted, notifyEnrolmentSubmitted } from '@/lib/notifications';
 
 export type EnrolmentPayload = {
@@ -23,6 +24,40 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+async function callSubmitRpc(
+  fn: 'submit_enrolment' | 'submit_contact_enquiry',
+  params: Record<string, unknown>
+): Promise<string> {
+  try {
+    const supabase = createServiceClient();
+    const { data: id, error } = await supabase.rpc(fn, params);
+    if (error) throw new Error(error.message);
+    return String(id);
+  } catch (serviceErr) {
+    const url = getSupabaseUrl().replace(/\/$/, '');
+    const anonKey = getSupabaseAnonKey();
+    const res = await fetch(`${url}/rest/v1/rpc/${fn}`, {
+      method: 'POST',
+      headers: {
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(params)
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      const serviceMsg = serviceErr instanceof Error ? serviceErr.message : String(serviceErr);
+      throw new Error(body || serviceMsg || 'Could not save submission');
+    }
+
+    const id = await res.json();
+    return String(id);
+  }
+}
+
 export async function submitPublicEnrolment(payload: EnrolmentPayload) {
   const record = {
     full_name: payload.full_name.trim(),
@@ -39,8 +74,7 @@ export async function submitPublicEnrolment(payload: EnrolmentPayload) {
   if (record.phone.length < 6) throw new Error('Phone number is required');
   if (record.programme.length < 2) throw new Error('Programme is required');
 
-  const supabase = createServiceClient();
-  const { data: id, error } = await supabase.rpc('submit_enrolment', {
+  const id = await callSubmitRpc('submit_enrolment', {
     p_full_name: record.full_name,
     p_email: record.email,
     p_phone: record.phone,
@@ -50,12 +84,10 @@ export async function submitPublicEnrolment(payload: EnrolmentPayload) {
     p_message: record.message
   });
 
-  if (error) throw new Error(error.message);
-
   const notify = await notifyEnrolmentSubmitted(record);
 
   return {
-    id: id as string,
+    id,
     saved: true,
     ...notify
   };
@@ -74,8 +106,7 @@ export async function submitPublicEnquiry(payload: EnquiryPayload) {
   if (!/^[^@]+@[^@]+\.[^@]+$/.test(record.email)) throw new Error('Valid email is required');
   if (record.message.length < 5) throw new Error('Message is required');
 
-  const supabase = createServiceClient();
-  const { data: id, error } = await supabase.rpc('submit_contact_enquiry', {
+  const id = await callSubmitRpc('submit_contact_enquiry', {
     p_full_name: record.full_name,
     p_email: record.email,
     p_phone: record.phone,
@@ -83,12 +114,10 @@ export async function submitPublicEnquiry(payload: EnquiryPayload) {
     p_message: record.message
   });
 
-  if (error) throw new Error(error.message);
-
   const notify = await notifyEnquirySubmitted(record);
 
   return {
-    id: id as string,
+    id,
     saved: true,
     ...notify
   };
